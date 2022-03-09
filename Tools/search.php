@@ -5,6 +5,7 @@ class Search {
     private string $path;
     public int $searchedDirs = 0;
     public int $searchedFiles = 0;
+    public ?array $toExclude = null;
 
     public function __construct($argv)
     {
@@ -18,21 +19,32 @@ class Search {
 
     private function parseArg($arg, $index)
     {
+        if (gettype($this->toExclude) == "array") {
+            $parts = explode(",", $arg);
+            if (count($parts) >=2) {
+                $parts[0] = str_split($parts[0], 1);
+            } else {
+
+            }
+        }
         if($arg === "--help") {
             $this->write("Search v1.0");
             $this->write("Usage: php search.php [PATH] [STRING] [OPTIONS]");
             $this->write("Search for a STRING in files and filenames in PATH.");
             $this->write("Outputs in which files (with line) or filenames the STRING is present.");
-//            $this->write("OPTIONS:");
-//            $this->write("      -e --exclude \"[folder1, folder2]\""); // v1.1?
+            $this->write("OPTIONS:");
+            $this->write("      -e --exclude \"[folder1,folder2,file1,file2]\""); // v1.1?
             $this->write("To just type search put the following line in your .bashrc:");
             $this->write("alias search=\"php /path/to/search.php\"");
             exit();
         }
-        if($index === 1) {
+        if ($arg === "-e" || $arg === "--exclude") {
+            $this->toExclude = [];
+        }
+        if ($index === 1) {
             $this->path = $arg;
         }
-        if($index === 2) {
+        if ($index === 2) {
             $this->searchString = $arg;
         }
     }
