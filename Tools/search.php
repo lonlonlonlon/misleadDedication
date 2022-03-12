@@ -44,7 +44,7 @@ class Search {
             $this->write("Outputs in which files (with line) or filenames the STRING is present.");
             $this->write("");
             $this->write("OPTIONS:");
-            $this->write("-e --exclude \"folder1, folder2, file1, file2\"");
+            $this->write("-e --exclude \"('(|[|{')folder1, folder2, file1, file2(')|]|}')\"");
             $this->write("\tto exclude ALL files with specific name use filename.extension");
             $this->write("\tto exclude ONE SPECIFIC file use the relative or absolute path depending on PATH being absolute or relative");
             $this->write("\tto exclude a SPECIFIC folder use the relative or absolute path depending on PATH being absolute or relative");
