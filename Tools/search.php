@@ -46,8 +46,8 @@ class Search {
             $this->write("OPTIONS:");
             $this->write("-e --exclude \"folder1, folder2, file1, file2\"");
             $this->write("\tto exclude ALL files with specific name use filename.extension");
-            $this->write("\tto exclude ONE SPECIFIC file use the relative path (./folder/file.extension) originating in PATH");
-            $this->write("\tto exclude a SPECIFIC folder use the relative path (./folder1/folder2) originating in PATH");
+            $this->write("\tto exclude ONE SPECIFIC file use the relative or absolute path depending on PATH being absolute or relative");
+            $this->write("\tto exclude a SPECIFIC folder use the relative or absolute path depending on PATH being absolute or relative");
             $this->write("-c --color use colors to highlight results");
             $this->write("-i --insensitive use case insensitive search");
             $this->write("");
@@ -82,7 +82,7 @@ class Search {
         if(!$this->useColor) {
             $string = preg_replace("/" . HIT . "/", "Hit", $string);
             $string = preg_replace("/" . EXCLUDED . "/", "Excluded", $string);
-            $string = preg_replace("/" . ERROR_READING . "/", "Error Reading", $string);
+            $string = preg_replace("/" . ERROR_READING . "/", "Error reading", $string);
             $string = preg_replace("/" . FILE . "/", "file", $string);
             $string = preg_replace("/" . FILENAME . "/", "filename", $string);
             $string = preg_replace("/" . CYAN . "/", "", $string);
@@ -92,7 +92,7 @@ class Search {
         } else {
             $string = preg_replace("/" . HIT . "/", "\033[0;32mHit\033[0m", $string);
             $string = preg_replace("/" . EXCLUDED . "/", "\033[0;33mExcluded\033[0m", $string);
-            $string = preg_replace("/" . ERROR_READING . "/", "\033[0;31mError Reading\033[0m", $string);
+            $string = preg_replace("/" . ERROR_READING . "/", "\033[0;31mError reading\033[0m", $string);
             $string = preg_replace("/" . FILE . "/", "\033[0;36mfile\033[0m", $string);
             $string = preg_replace("/" . FILENAME . "/", "\033[0;35mfilename\033[0m", $string);
             $string = preg_replace("/" . CYAN . "/", "\033[0;96m", $string);
@@ -141,10 +141,16 @@ class Search {
             $toExcludeTmp[count($toExcludeTmp) - 1] = trim($toExcludeTmp[count($toExcludeTmp) - 1], " ])}");
             foreach ($toExcludeTmp as $index => $item) {
                 $toExcludeTmp[$index] = trim($item, " ");
+                if(str_ends_with($item, "/")) {
+                    $toExcludeTmp[$index] = rtrim($item, "/");
+                }
             }
         } else {
             // count($toExclude) == 1
             $toExcludeTmp[0] = trim($toExcludeTmp[0], " [](){}");
+            if(str_ends_with($toExcludeTmp[0], "/")) {
+                $toExcludeTmp[0] = rtrim($toExcludeTmp[0], "/");
+            }
         }
         $this->toExclude = $toExcludeTmp;
     }
