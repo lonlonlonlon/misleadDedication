@@ -34,6 +34,7 @@ class Search {
     {
         if($this->excludeArgIncoming) {
             $this->parseExcludeArg($arg);
+            $this->excludeArgIncoming = false;
             return;
         }
 
@@ -52,6 +53,9 @@ class Search {
             $this->write("\tuse colors to highlight results");
             $this->write("-i --insensitive");
             $this->write("\tuse case insensitive search");
+            $this->write("");
+            $this->write("Example:");
+            $this->write("\tphp /path/to/search.php /var/www/html BraveElephant -c -i -e \"[/var/www/html/public, /var/www/html/vendor]\"");
             $this->write("");
             $this->write("To just type search put the following line in your .bashrc:");
             $this->write("alias search=\"php /path/to/search.php\"");
@@ -132,7 +136,7 @@ class Search {
         $this->write("took $time seconds");
     }
 
-    private function parseExcludeArg($arg) // TODO: noch einbauen wenn angabe zu relativem pfad dass / am ende entfernt wird wenn vorhanden
+    private function parseExcludeArg($arg)
     {
         $toExcludeTmp = explode(",", $arg);
         if(count($toExcludeTmp) == 0) {
@@ -143,8 +147,10 @@ class Search {
             $toExcludeTmp[count($toExcludeTmp) - 1] = trim($toExcludeTmp[count($toExcludeTmp) - 1], " ])}");
             foreach ($toExcludeTmp as $index => $item) {
                 $toExcludeTmp[$index] = trim($item, " ");
+                echo("$item\n");
                 if(str_ends_with($item, "/")) {
                     $toExcludeTmp[$index] = rtrim($item, "/");
+                    echo(rtrim($item, "/")."\n");
                 }
             }
         } else {
