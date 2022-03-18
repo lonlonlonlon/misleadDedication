@@ -147,10 +147,8 @@ class Search {
             $toExcludeTmp[count($toExcludeTmp) - 1] = trim($toExcludeTmp[count($toExcludeTmp) - 1], " ])}");
             foreach ($toExcludeTmp as $index => $item) {
                 $toExcludeTmp[$index] = trim($item, " ");
-                echo("$item\n");
                 if(str_ends_with($item, "/")) {
                     $toExcludeTmp[$index] = rtrim($item, "/");
-                    echo(rtrim($item, "/")."\n");
                 }
             }
         } else {
