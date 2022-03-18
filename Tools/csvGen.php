@@ -32,7 +32,7 @@ class csvGen
         $this->write("");
         $this->write("Example:");
         $this->write("\tphp /path/to/csvGen.php \"id:incInt:5, \" -f output.csv"); // die typen in module auslagern (ohne core-codeänderungen erweiterbar)
-        $this->write("");
+        $this->write(""); // villeciht noch RGB modul in statisch?
         $this->write("To just type csv-gen put the following line in your .bashrc:");
         $this->write("alias csv-gen=\"php /path/to/csvGen.php\"");
         exit();
