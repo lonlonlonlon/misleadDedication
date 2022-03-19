@@ -15,6 +15,12 @@ class csvGen
     {
         if ($arg === "--help" || $arg === "-h") {
             $this->help();
+            exit();
+        }
+        if (str_starts_with($arg, '-')) {
+            $buchstabs = explode('', $arg);
+            foreach ($buchstabs as$imdex=>$buchstab){if(empty($buchstab)){unset($buchstabs[$imdex]);}}
+            
         }
     }
 
@@ -31,7 +37,9 @@ class csvGen
         $this->write("\tdont write a header");
         $this->write("");
         $this->write("Example:");
-        $this->write("\tphp /path/to/csvGen.php \"id:incInt:5, \" -f output.csv"); // die typen in module auslagern (ohne core-codeänderungen erweiterbar)
+        $this->write(
+            "\tphp /path/to/csvGen.php \"id:incInt:5, \" -f output.csv"
+        ); // die typen in module auslagern (ohne core-codeänderungen erweiterbar)
         $this->write(""); // villeciht noch RGB modul in statisch?
         $this->write("To just type csv-gen put the following line in your .bashrc:");
         $this->write("alias csv-gen=\"php /path/to/csvGen.php\"");
@@ -41,6 +49,10 @@ class csvGen
     public function write($string)
     {
         echo($string . "\n");
+    }
+
+    private function doMagic()
+    {
     }
 }
 
