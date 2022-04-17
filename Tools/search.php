@@ -220,7 +220,22 @@ function recur($path, $searchString, $search)
                     continue;
                 }
                 $index = 1;
-                while (($line = fgets($handle)) !== false) {
+                if (($line = @fgets($handle)) !== false) {
+                    if($search->caseSensitive) {
+                        if (str_contains($line, $searchString)) {
+                            $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
+                        }
+                    } else {
+                        if (stripos($line, $searchString)) {
+                            $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
+                        }
+                    }
+                    $index = 2;
+                } else {
+                    $search->write(ERROR_READING . " $path$item");
+                    continue;
+                }
+                while (($line = @fgets($handle)) !== false) {
                     if($search->caseSensitive) {
                         if (str_contains($line, $searchString)) {
                             $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
