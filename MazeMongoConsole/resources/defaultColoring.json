@@ -1,0 +1,55 @@
+{
+  "info": "Put in the char to define its F foreground and B background color. All css colors can be used.",
+  ".": {
+    "F": "grey",
+    "B": "green"
+  },
+  "|": {
+    "F": "white",
+    "B": "black"
+  },
+  "~": {
+    "F": "white",
+    "B": "blue"
+  },
+  "/": {
+    "F": "white",
+    "B": "grey"
+  },
+  "bslsh": {
+    "F": "white",
+    "B": "grey"
+  },
+  "_": {
+    "F": "white",
+    "B": "black"
+  },
+  "#": {
+    "F": "white",
+    "B": "black"
+  },
+  "U": {
+    "F": "cyan",
+    "B": "black"
+  },
+  "Y": {
+    "F": "white",
+    "B": "grey"
+  },
+  "H": {
+    "F": "cyan",
+    "B": "chocolate"
+  },
+  "m": {
+    "F": "red",
+    "B": "firebrick"
+  },
+  "l": {
+    "F": "maroon",
+    "B": "burlywood"
+  },
+  "+": {
+    "F": "grey",
+    "B": "white"
+  }
+}

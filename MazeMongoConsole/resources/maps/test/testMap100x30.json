@@ -1,0 +1,24 @@
+{
+  "startPos": {
+    "x": "58",
+    "y": "16"
+  },
+  "windowSize": {
+    "x": "70",
+    "y": "20"
+  },
+  "mapSize": {
+    "x": "100",
+    "y": "30"
+  },
+  "textSize": "x-large",
+  "interactions":{
+    "collisions": {
+      "1_1": true,
+      "1_2": true
+    },
+    "portals": {
+      "7_49": "testMap2"
+    }
+  }
+}
