@@ -10,7 +10,7 @@ class MainLoop
         // spielstand Scheiß, vielleicht serialisiertes Objekt deserialisieren
         $this->display = new Display();
         $this->display->loadMap(mapName: 'test/testMap2');
-        $this->cliComponent = new CliComponent();
+        $this->cliComponent = new CliComponent(fopen('php://stdin', 'r'));
         $this->loop();
     }
 
@@ -18,7 +18,8 @@ class MainLoop
     {
         while (1) {
             $this->display->render();
-            $this->cliComponent->getInput();
+            $in = $this->cliComponent->getInput();
+            echo("\n$in\n");
         }
     }
 }
