@@ -34,20 +34,8 @@ class Person
      */
     private $nickName;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Relation::class, mappedBy="person1", orphanRemoval=true)
-     */
-    private $relations1;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Relation::class, mappedBy="person2", orphanRemoval=true)
-     */
-    private $relations2;
-
     public function __construct()
     {
-        $this->relations1 = new ArrayCollection();
-        $this->relations2 = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,70 +77,5 @@ class Person
         $this->nickName = $nickName;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, Relation>
-     */
-    public function getRelations1(): Collection
-    {
-        return $this->relations1;
-    }
-
-    public function addRelation(Relation $relation): self
-    {
-        if (!$this->relations1->contains($relation)) {
-            $this->relations1[] = $relation;
-            $relation->setPerson1($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRelation(Relation $relation): self
-    {
-        if ($this->relations1->removeElement($relation)) {
-            // set the owning side to null (unless already changed)
-            if ($relation->getPerson1() === $this) {
-                $relation->setPerson1(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Relation>
-     */
-    public function getRelations2(): Collection
-    {
-        return $this->relations2;
-    }
-
-    public function addRelations2(Relation $relations2): self
-    {
-        if (!$this->relations2->contains($relations2)) {
-            $this->relations2[] = $relations2;
-            $relations2->setPerson2($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRelations2(Relation $relations2): self
-    {
-        if ($this->relations2->removeElement($relations2)) {
-            // set the owning side to null (unless already changed)
-            if ($relations2->getPerson2() === $this) {
-                $relations2->setPerson2(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getRelations()
-    {
-        return array_merge_recursive($this->relations1, $this->relations2);
     }
 }
