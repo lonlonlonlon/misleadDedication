@@ -1,0 +1,4 @@
+Hallo Leon, wie geht es dir Heute?
+Hallo Frank, mir geht es gut, danke der Nachfrage!
+Hast du mittlerweile herausgefunden wie man programmiert?
+Ja, mittlerweile habe ich es begriffen. Ich habe einen Taschenrechner programmiert.
