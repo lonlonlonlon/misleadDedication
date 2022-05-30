@@ -15,12 +15,32 @@ class Main
         ini_set('memory_limit','0');
         set_time_limit(0);
         $handle = fopen ("php://stdin","r");
-        $str = system('pwd');
+        while (1) {
+            system('cls');
+            write("load brain? = l | train new Brain? = t (l/t)");
+            $input = trim(fgets($handle));
+            if ($input === "l") {
+                $this->loadBrain();
+
+            } elseif ($input === "t") {
+                break;
+            } else {
+                write("invalid input");
+            }
+        }
+
+        $this->prepareTrain($handle);
+        $this->generateCliStrat();
+    }
+
+    public function prepareTrain($handle)
+    {
+        $pwd = system('pwd');
         system('clear');
-        write("Input Ordner: ($str/input)");
+        write("Input Ordner: ($pwd/input)");
         $in = trim(fgets($handle));
         if (!$in) {
-            $in = $str."/input";
+            $in = $pwd."/input";
         }
         if (!is_dir($in)) {
             if (!is_dir("./$in")) {
@@ -33,7 +53,6 @@ class Main
             $in =  $in."/";
         }
         $this->train($in);
-        $this->generateCliStrat();
     }
 
     private function train(string $inFolder)
