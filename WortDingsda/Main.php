@@ -3,25 +3,26 @@
 namespace WortDingsda;
 
 use Exception;
-use MongoDB\Driver\Exception\CommandException;
 
 require_once "Brain.php";
 
 class Main
 {
     private Brain $brain;
+
     public function __construct()
     {
-        ini_set('memory_limit','0');
+        ini_set('memory_limit', '16G');
         set_time_limit(0);
-        $handle = fopen ("php://stdin","r");
-        while (1) {
-            system('cls');
+        $this->brain = new Brain();
+        $handle = fopen("php://stdin", "r");
+        while (true) {
+            clear();
             write("load brain? = l | train new Brain? = t (l/t)");
             $input = trim(fgets($handle));
             if ($input === "l") {
-                $this->loadBrain();
-
+                $this->loadBrainDialouge($handle);
+                break;
             } elseif ($input === "t") {
                 break;
             } else {
@@ -30,17 +31,17 @@ class Main
         }
 
         $this->prepareTrain($handle);
-        $this->generateCliStrat();
+        $this->generateCliStrat($handle);
     }
 
     public function prepareTrain($handle)
     {
         $pwd = system('pwd');
-        system('clear');
+        clear();
         write("Input Ordner: ($pwd/input)");
         $in = trim(fgets($handle));
         if (!$in) {
-            $in = $pwd."/input";
+            $in = $pwd . "/input";
         }
         if (!is_dir($in)) {
             if (!is_dir("./$in")) {
@@ -50,7 +51,7 @@ class Main
             $in = "./$in";
         }
         if (!str_ends_with($in, '/')) {
-            $in =  $in."/";
+            $in = $in . "/";
         }
         $this->train($in);
     }
@@ -60,7 +61,7 @@ class Main
         $fileArray = [];
         $dirContent = scandir($inFolder);
         foreach ($dirContent as $item) {
-            if (!is_file($inFolder."/".$item)) {
+            if (!is_file($inFolder . "/" . $item)) {
                 continue;
             }
             if ($item == '.') {
@@ -77,7 +78,7 @@ class Main
                 }
                 $this->trainOnFile($content);
             } catch (Exception $exception) {
-                log("Error while training, reading $inFolder/$item failed with Exception:\n".$exception->getMessage()."\n".$exception->getTraceAsString());
+                log("Error while training, reading $inFolder/$item failed with Exception:\n" . $exception->getMessage() . "\n" . $exception->getTraceAsString());
             }
         }
     }
@@ -97,18 +98,88 @@ class Main
         $contentArray = preg_split('/ /', $content);
         debug(var_export($contentArray, 1));
         foreach ($contentArray as $pos => $word) {
-            $this->brain->addWordInfo($word, [
-                $contentArray[$pos + 1],
-                $contentArray[$pos + 2],
-                $contentArray[$pos + 3],
-                $contentArray[$pos + 4],
-                $contentArray[$pos + 5]
-            ]);
+            $infoArray = [];
+            // [
+            //                $contentArray[$pos + 1],
+            //                $contentArray[$pos + 2],
+            //                $contentArray[$pos + 3],
+            //                $contentArray[$pos + 4],
+            //                $contentArray[$pos + 5]
+            //            ]
+            if (@$contentArray[$pos + 1]) {
+                $infoArray[0] = $contentArray[$pos + 1];
+                if (@$contentArray[$pos + 3]) {
+                    $infoArray[1] = $contentArray[$pos + 2];
+                    if (@$contentArray[$pos + 3]) {
+                        $infoArray[2] = $contentArray[$pos + 3];
+                        if (@$contentArray[$pos + 4]) {
+                            $infoArray[3] = $contentArray[$pos + 4];
+                            if (@$contentArray[$pos + 5]) {
+                                $infoArray[4] = $contentArray[$pos + 5];
+                            }
+                        }
+                    }
+                }
+            }
+            $this->brain->addWordInfo($word, $infoArray);
         }
         // schon trainiert? xD
-        exit();
+    }
+
+    private function loadBrainDialouge($handle)
+    {
+        while (1) {
+            clear();
+            write("welches Brain?");
+            $brains = scandir('./brains/');
+            foreach ($brains as $index => $brain) {
+                if ($brain === '.' || $brain === '..') {
+                    unset($brains[$brain]);
+                } else {
+                    if (str_ends_with($brain, '.brain')) {
+                        write("$brain");
+                    }
+                }
+            }
+            $input = trim(fgets($handle));
+            if (is_file("./brain/$input.brain")) {
+                $this->brain = $this->loadBrain("./brain/$input.brain");
+                break;
+            }
+        }
+        $this->generateCliStrat($handle);
+    }
+
+    private function loadBrain(string $pathToBrain): Brain
+    {
+        try {
+            $brain = unserialize(file_get_contents($pathToBrain));
+        } catch (Exception $exception) {
+            log("hier noch son Fehler oder so: also beim hirn lesen\n" . $exception->getMessage() . "\n" . $exception->getTraceAsString());
+        }
+        return $brain;
+    }
+
+    private function generateCliStrat($handle)
+    {
+        clear();
+        write("press the enter to continue");
+        fgets($handle);
+        $brain = $this->brain;
+        $text = $brain->getRandomWord();
+        $lastWord = $text;
+        for ($n = 0; $n < 100; $n++) {
+            $add = $brain->getNFollowWord($lastWord, 0)[0];
+            if (!$add) {
+                $add = $brain->getRandomWord();
+            }
+            $text .= " ".$add;
+            $lastWord = $add;
+        }
+        write($text);
     }
 }
+
 // TODO: Idee: gespräche im Raum mitschneiden und spracherkennung anbinden die gespräche als Trainingsdaten mitschneidet
 $main = new Main();
 
@@ -126,14 +197,22 @@ $main = new Main();
  * zu jedem Wort bis zu 5 worte die oft an n'ter stelle danach kommen mit ihrer Häufigkeit im bisherigen Training
  */
 
-function write(string $text) {
-    echo($text."\n");
+function write(string $text)
+{
+    echo($text . "\n");
 }
 
-function log(string $message) {
+function log(string $message)
+{
     file_put_contents("logfile.log", "$message\n", FILE_APPEND);
 }
 
-function debug(string $message) {
+function debug(string $message)
+{
     file_put_contents("debugfile.log", "$message\n", FILE_APPEND);
+}
+
+function clear()
+{
+    system('clear');
 }
