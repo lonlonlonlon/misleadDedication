@@ -38,19 +38,13 @@ class Brain
 
     public function addWordInfo(string $word, array $info)
     {
+        $word = strtolower($word);
         /**
          * $word the word to add info about
-         * $info the array consisting of 5 words in order left to right
+         * $info = ["word", "word", "word", "word", "word"] (array pos 0 = follow pos 1)
          */
         $oldInfo = @$this->wordTable[$word];
         if (!$oldInfo) {
-            // [
-            //                0 => [[$info[0], 1]],
-            //                1 => [[$info[1], 1]],
-            //                2 => [[$info[2], 1]],
-            //                3 => [[$info[3], 1]],
-            //                4 => [[$info[4], 1]]
-            //            ];
             $infoArray = [];
             if (@$info[0]) {
                 $infoArray[0] = [$info[0], 1];
@@ -67,29 +61,60 @@ class Brain
                     }
                 }
             }
+            var_dump($infoArray);
             $this->wordTable[$word] = $infoArray;
             return;
-        }
-        foreach ($oldInfo as $followingWordPosition => &$followWordsWithScore) {
-            $wordAlreadyPresent = false;
-            foreach ($followWordsWithScore as $currArrayPosOfFollowWord => &$followWordWithScore) {
-                if ($followWordsWithScore[0] == @$info[$followingWordPosition]) {
-                    $wordAlreadyPresent = true;
-                    $followWordsWithScore[$currArrayPosOfFollowWord] = [$followWordsWithScore[0], $followWordsWithScore[1] + 1];
-                }
-            }
-            if (!$wordAlreadyPresent && @$info[$followingWordPosition]) {
-                $followWordsWithScore[count($followWordsWithScore)] = [$info[$followingWordPosition], 1];
+        } else {
+            foreach ($oldInfo as $followWordPosition => $oldInfoToPosition) {
+                // hier weiter
+                // achtung, villeicht exits(); verstreut
             }
         }
     }
 
-    public function getNFollowWord(string $word, int $position = 0)
+    public function getNFollowWords(string $word, int $position = 0)
     {
         /**
          * $position may be 0-4, for positions 1-5
+         * returns [["word", 65], ["word", 23], ...n]
          */
+        $word = strtolower($word);
         $info = $this->wordTable[$word];
+        var_dump($info);
+        exit();
         return $info[$position];
+    }
+
+    public function getCalculatedFollower(array $lastWords)
+    {
+        $candidates = [];
+        foreach ($lastWords as $index => $pastWord) {
+            // von hinten nach vorne : ["hallo", ",", "wie", "geht", "es"] => abs(index-4)
+            $pastWordInfo = $this->getNFollowWords($pastWord, abs($index-4));
+            $candidates[] = $this->randScoreBasedSelection($pastWordInfo);
+        }
+        exit();
+    }
+
+    private function randScoreBasedSelection(array $info): array
+    {
+        /**
+         * [["word", 65], ["word", 23], ...n] = $info
+         */
+        write("count info: ".count($info));
+        if (count($info) == 1) {
+            return $info[0];
+        }
+        var_dump($info);
+        $winner = array_shift($info);
+        foreach ($info as $singleInfo) {
+            $scoreAdd = $winner[1] + $singleInfo[1];
+            $randInt = random_int(0, $scoreAdd);
+            if ($randInt > $winner[1]) {
+                $winner = $singleInfo;
+            }
+        }
+        var_dump($winner);
+        return [];
     }
 }

@@ -12,6 +12,7 @@ class Main
 
     public function __construct()
     {
+        system("export TERM=linux");
         ini_set('memory_limit', '16G');
         set_time_limit(0);
         $this->brain = new Brain();
@@ -107,15 +108,15 @@ class Main
             //                $contentArray[$pos + 5]
             //            ]
             if (@$contentArray[$pos + 1]) {
-                $infoArray[0] = $contentArray[$pos + 1];
+                $infoArray[0] = strtolower($contentArray[$pos + 1]);
                 if (@$contentArray[$pos + 3]) {
-                    $infoArray[1] = $contentArray[$pos + 2];
+                    $infoArray[1] = strtolower($contentArray[$pos + 2]);
                     if (@$contentArray[$pos + 3]) {
-                        $infoArray[2] = $contentArray[$pos + 3];
+                        $infoArray[2] = strtolower($contentArray[$pos + 3]);
                         if (@$contentArray[$pos + 4]) {
-                            $infoArray[3] = $contentArray[$pos + 4];
+                            $infoArray[3] = strtolower($contentArray[$pos + 4]);
                             if (@$contentArray[$pos + 5]) {
-                                $infoArray[4] = $contentArray[$pos + 5];
+                                $infoArray[4] = strtolower($contentArray[$pos + 5]);
                             }
                         }
                     }
@@ -123,6 +124,7 @@ class Main
             }
             $this->brain->addWordInfo($word, $infoArray);
         }
+        exit();
         // schon trainiert? xD
     }
 
@@ -160,21 +162,28 @@ class Main
         return $brain;
     }
 
+    private function decideBetweenWords(string $word1, int $score1, string $word2, int $score2) {
+        $scoreAdd = $score1 + $score2;
+        $rand = random_int(0, $scoreAdd);
+        if ($rand > $score1) {
+            return $word2;
+        } else {
+            return $word1;
+        }
+    }
+
     private function generateCliStrat($handle)
     {
         clear();
         write("press the enter to continue");
         fgets($handle);
         $brain = $this->brain;
-        $text = $brain->getRandomWord();
-        $lastWord = $text;
+        $text = "Hallo , wie geht es";
+        $lastWords = ["hallo", ",", "wie", "geht", "es"];
         for ($n = 0; $n < 100; $n++) {
-            $add = $brain->getNFollowWord($lastWord, 0)[0];
-            if (!$add) {
-                $add = $brain->getRandomWord();
-            }
+            $add = $brain->getCalculatedFollower($lastWords);
             $text .= " ".$add;
-            $lastWord = $add;
+            array_shift($lastWords);
         }
         write($text);
     }
