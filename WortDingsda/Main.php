@@ -59,7 +59,6 @@ class Main
 
     private function train(string $inFolder)
     {
-        $fileArray = [];
         $dirContent = scandir($inFolder);
         foreach ($dirContent as $item) {
             if (!is_file($inFolder . "/" . $item)) {
@@ -124,7 +123,6 @@ class Main
             }
             $this->brain->addWordInfo($word, $infoArray);
         }
-        exit();
         // schon trainiert? xD
     }
 
@@ -184,6 +182,7 @@ class Main
             $add = $brain->getCalculatedFollower($lastWords);
             $text .= " ".$add;
             array_shift($lastWords);
+            array_push($lastWords, $add);
         }
         write($text);
     }

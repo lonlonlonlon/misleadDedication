@@ -33,7 +33,7 @@ class Brain
     public function getRandomWord(): string
     {
         $tmp = array_keys($this->wordTable);
-        return $tmp[random_int(0,count($this->wordTable)-1)];
+        return $tmp[random_int(0, count($this->wordTable) - 1)];
     }
 
     public function addWordInfo(string $word, array $info)
@@ -47,32 +47,45 @@ class Brain
         if (!$oldInfo) {
             $infoArray = [];
             if (@$info[0]) {
-                $infoArray[0] = [$info[0], 1];
+                $infoArray[0] = [[$info[0], 1]];
                 if (@$info[1]) {
-                    $infoArray[1] = [$info[1], 1];
+                    $infoArray[1] = [[$info[1], 1]];
                     if (@$info[2]) {
-                        $infoArray[2] = [$info[2], 1];
+                        $infoArray[2] = [[$info[2], 1]];
                         if (@$info[3]) {
-                            $infoArray[3] = [$info[3], 1];
+                            $infoArray[3] = [[$info[3], 1]];
                             if (@$info[4]) {
-                                $infoArray[4] = [$info[4], 1];
+                                $infoArray[4] = [[$info[4], 1]];
                             }
                         }
                     }
                 }
             }
-            var_dump($infoArray);
             $this->wordTable[$word] = $infoArray;
             return;
         } else {
-            foreach ($oldInfo as $followWordPosition => $oldInfoToPosition) {
-                // hier weiter
-                // achtung, villeicht exits(); verstreut
+            foreach ($oldInfo as $followWordPosition => &$oldInfoToPosition) {
+                $wordAlreadyPresent = false;
+                var_dump($oldInfoToPosition); // [["word", 23], ...n]
+                foreach ($info as $newInfoPosition => $newInfoWord) {
+                    if ($followWordPosition == $newInfoPosition) {
+                        // positionen stimmen überein
+                        foreach ($oldInfoToPosition as $index => &$item) {
+                            if ($newInfoWord == $item[0]) {
+                                $wordAlreadyPresent = true;
+                                $item[1] += 1;
+                            }
+                        }
+                    }
+                }
+                if (!$wordAlreadyPresent) {
+                    $oldInfoToPosition[] = [$info[$followWordPosition], 1];
+                }
             }
         }
     }
 
-    public function getNFollowWords(string $word, int $position = 0)
+    public function getNFollowWords(string $word, int $position)
     {
         /**
          * $position may be 0-4, for positions 1-5
@@ -80,32 +93,40 @@ class Brain
          */
         $word = strtolower($word);
         $info = $this->wordTable[$word];
-        var_dump($info);
-        exit();
         return $info[$position];
     }
 
-    public function getCalculatedFollower(array $lastWords)
+    public function getCalculatedFollower(array $lastWords): string
     {
         $candidates = [];
+        if (empty($lastWords)) {
+            write("isEmpty!!§!!");
+            exit();
+        }
         foreach ($lastWords as $index => $pastWord) {
             // von hinten nach vorne : ["hallo", ",", "wie", "geht", "es"] => abs(index-4)
-            $pastWordInfo = $this->getNFollowWords($pastWord, abs($index-4));
-            $candidates[] = $this->randScoreBasedSelection($pastWordInfo);
+            $pastWordInfo = $this->getNFollowWords($pastWord, abs($index - 4));
+            write("dump +++++++++++++++++");
+            var_dump($lastWords);
+            $candidate = $this->randScoreBasedSelection($pastWordInfo);
+            array_push($candidates, $candidate);
         }
-        exit();
+        var_dump($candidates);
+        $winner = $this->randScoreBasedSelection($candidates)[0];
+        write("winner: " . $winner);
+        return $winner;
     }
 
     private function randScoreBasedSelection(array $info): array
     {
+        // hier kommen leere Arrays an! Problem !!!!!!!
         /**
          * [["word", 65], ["word", 23], ...n] = $info
+         * returns string $word
          */
-        write("count info: ".count($info));
         if (count($info) == 1) {
             return $info[0];
         }
-        var_dump($info);
         $winner = array_shift($info);
         foreach ($info as $singleInfo) {
             $scoreAdd = $winner[1] + $singleInfo[1];
@@ -114,7 +135,6 @@ class Brain
                 $winner = $singleInfo;
             }
         }
-        var_dump($winner);
-        return [];
+        return $winner;
     }
 }
