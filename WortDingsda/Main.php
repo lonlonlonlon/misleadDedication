@@ -177,8 +177,9 @@ class Main
         write("press the enter to continue");
         fgets($handle);
         $brain = $this->brain;
-        $text = "Hallo , wie geht es";
-        $lastWords = ["hallo", ",", "wie", "geht", "es"];
+//        Muster für start:
+//        $text = "Hallo , wie geht es";
+//        $lastWords = ["hallo", ",", "wie", "geht", "es"];
         $tmp = $this->generateTextStart();
         $text = $tmp[0];
         $lastWords = $tmp[1];
