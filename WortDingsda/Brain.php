@@ -66,7 +66,6 @@ class Brain
         } else {
             foreach ($oldInfo as $followWordPosition => &$oldInfoToPosition) {
                 $wordAlreadyPresent = false;
-                var_dump($oldInfoToPosition); // [["word", 23], ...n]
                 foreach ($info as $newInfoPosition => $newInfoWord) {
                     if ($followWordPosition == $newInfoPosition) {
                         // positionen stimmen überein
@@ -99,21 +98,13 @@ class Brain
     public function getCalculatedFollower(array $lastWords): string
     {
         $candidates = [];
-        if (empty($lastWords)) {
-            write("isEmpty!!§!!");
-            exit();
-        }
         foreach ($lastWords as $index => $pastWord) {
             // von hinten nach vorne : ["hallo", ",", "wie", "geht", "es"] => abs(index-4)
             $pastWordInfo = $this->getNFollowWords($pastWord, abs($index - 4));
-            write("dump +++++++++++++++++");
-            var_dump($lastWords);
             $candidate = $this->randScoreBasedSelection($pastWordInfo);
             array_push($candidates, $candidate);
         }
-        var_dump($candidates);
         $winner = $this->randScoreBasedSelection($candidates)[0];
-        write("winner: " . $winner);
         return $winner;
     }
 

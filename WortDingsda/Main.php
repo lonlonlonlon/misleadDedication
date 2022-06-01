@@ -95,8 +95,9 @@ class Main
         $content = preg_replace('/ {4}/', ' ', $content);
         $content = preg_replace('/ {3}/', ' ', $content);
         $content = preg_replace('/ {2}/', ' ', $content);
+        $content = preg_replace('/“/', '', $content);
+        $content = preg_replace('/„|"/', ' ', $content);
         $contentArray = preg_split('/ /', $content);
-        debug(var_export($contentArray, 1));
         foreach ($contentArray as $pos => $word) {
             $infoArray = [];
             // [
@@ -178,6 +179,9 @@ class Main
         $brain = $this->brain;
         $text = "Hallo , wie geht es";
         $lastWords = ["hallo", ",", "wie", "geht", "es"];
+        $tmp = $this->generateTextStart();
+        $text = $tmp[0];
+        $lastWords = $tmp[1];
         for ($n = 0; $n < 100; $n++) {
             $add = $brain->getCalculatedFollower($lastWords);
             $text .= " ".$add;
@@ -185,6 +189,28 @@ class Main
             array_push($lastWords, $add);
         }
         write($text);
+    }
+
+    private function generateTextStart()
+    {
+        /**
+         * returns [$text, $lastWords]
+         */
+        $text = $this->brain->getRandomWord()." ";
+        $lastWords = [trim($text)];
+        $word = $this->brain->getCalculatedFollower($lastWords);
+        $lastWords[] = $word;
+        $text .= $word." ";
+        $word = $this->brain->getCalculatedFollower($lastWords);
+        $lastWords[] = $word;
+        $text .= $word." ";
+        $word = $this->brain->getCalculatedFollower($lastWords);
+        $lastWords[] = $word;
+        $text .= $word." ";
+        $word = $this->brain->getCalculatedFollower($lastWords);
+        $lastWords[] = $word;
+        $text .= $word;
+        return [$text, $lastWords];
     }
 }
 
