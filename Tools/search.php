@@ -14,11 +14,13 @@ class Search {
     private string $path;
     public int $searchedDirs = 0;
     public int $searchedFiles = 0;
+    public int $bytesSearched = 0;
     private bool $excludeArgIncoming = false;
     public array $toExclude = [];
     private bool $useColor = false;
     public bool $caseSensitive = true;
     public bool $justNames = false;
+    public bool $hideErrors;
 
 
     public function __construct($argv)
@@ -56,6 +58,8 @@ class Search {
             $this->write("\tuse case insensitive search");
             $this->write("-j --just-names");
             $this->write("\tdon't search file contents");
+            $this->write("-H --hide-errors");
+            $this->write("\tdon't print error messages");
             $this->write("");
             $this->write("Example:");
             $this->write("\tphp /path/to/search.php /var/www/html BraveElephant -c -i -e \"[/var/www/html/public, /var/www/html/vendor]\"");
@@ -85,6 +89,9 @@ class Search {
             }
             if($arg === "-j" || $arg === "--just-names") {
                 $this->justNames = true;
+            }
+            if($arg === "-H" || $arg === "--hide-errors") {
+                $this->hideErrors = true;
             }
             return;
         }
@@ -136,8 +143,20 @@ class Search {
         $startTime = microtime(true);
         recur($this->path, $this->searchString, $this);
         $endTime = microtime(true);
+        if (strlen($this->bytesSearched) <= 3) {
+            $dataString = $this->bytesSearched.' B';
+        } elseif (strlen($this->bytesSearched) <= 6) {
+            $dataString = ($this->bytesSearched / 1000) .' KB';
+        } elseif (strlen($this->bytesSearched) <= 9) {
+            $dataString = ($this->bytesSearched / 1000000) .' MB';
+        } elseif (strlen($this->bytesSearched) <= 12) {
+            $dataString = ($this->bytesSearched / 1000000000) .' GB';
+        } elseif (strlen($this->bytesSearched) <= 15) {
+            $dataString = ($this->bytesSearched / 1000000000000) .' TB';
+        }
         $this->write("searched directories: $this->searchedDirs");
         $this->write("searched files: $this->searchedFiles");
+        $this->write("searched data: $dataString");
         $time = $endTime - $startTime;
         $this->write("took $time seconds");
     }
@@ -177,7 +196,9 @@ function recur($path, $searchString, $search)
         $search->searchedDirs += 1;
         @$dirContent = scandir($path);
         if(empty($dirContent)) {
-            $search->write(ERROR_READING . " $path");
+            if (!$search->hideErrors){
+                $search->write(ERROR_READING . " $path");
+            }
             return;
         }
         foreach ($dirContent as $item) {
@@ -227,9 +248,12 @@ function recur($path, $searchString, $search)
 
                 }
                 if($handle === false || empty($handle)) {
-                    $search->write(ERROR_READING . " $path$item");
+                    if (!$search->hideErrors){
+                        $search->write(ERROR_READING . " $path$item");
+                    }
                     continue;
                 }
+                $search->bytesSearched += filesize($path . $item);
                 $index = 1;
                 if (($line = @fgets($handle)) !== false) {
                     if($search->caseSensitive) {
@@ -243,7 +267,9 @@ function recur($path, $searchString, $search)
                     }
                     $index = 2;
                 } else {
-                    $search->write(ERROR_READING . " $path$item");
+                    if (!$search->hideErrors){
+                        $search->write(ERROR_READING . " $path$item");
+                    }
                     continue;
                 }
                 while (($line = @fgets($handle)) !== false) {
