@@ -18,6 +18,7 @@ class Search {
     public array $toExclude = [];
     private bool $useColor = false;
     public bool $caseSensitive = true;
+    public bool $justNames = false;
 
 
     public function __construct($argv)
@@ -53,6 +54,8 @@ class Search {
             $this->write("\tuse colors to highlight results");
             $this->write("-i --insensitive");
             $this->write("\tuse case insensitive search");
+            $this->write("-j --just-names");
+            $this->write("\tdon't search file contents");
             $this->write("");
             $this->write("Example:");
             $this->write("\tphp /path/to/search.php /var/www/html BraveElephant -c -i -e \"[/var/www/html/public, /var/www/html/vendor]\"");
@@ -79,6 +82,9 @@ class Search {
             }
             if($arg === "-i" || $arg === "--insensitive") {
                 $this->caseSensitive = false;
+            }
+            if($arg === "-j" || $arg === "--just-names") {
+                $this->justNames = true;
             }
             return;
         }
@@ -153,7 +159,7 @@ class Search {
             }
         } else {
             // count($toExclude) == 1
-            $toExcludeTmp[0] = trim($toExcludeTmp[0], " [](){}");
+            $toExcludeTmp[0] = trim($toExcludeTmp[0], " [](){}\n\t");
             if(str_ends_with($toExcludeTmp[0], "/")) {
                 $toExcludeTmp[0] = rtrim($toExcludeTmp[0], "/");
             }
@@ -210,6 +216,11 @@ function recur($path, $searchString, $search)
                         $search->write(HIT . " in " . FILENAME . PINK . " $itemFileName" . CLEAR_COLOR);
                     }
                 }
+
+                if ($search->justNames) {
+                    continue;
+                }
+
                 try {
                     @$handle = fopen($path . $item, "r");
                 } catch (Exception $exception) {
