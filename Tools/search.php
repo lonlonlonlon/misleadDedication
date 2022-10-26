@@ -20,7 +20,7 @@ class Search {
     private bool $useColor = false;
     public bool $caseSensitive = true;
     public bool $justNames = false;
-    public bool $hideErrors;
+    public bool $hideErrors = false;
 
 
     public function __construct($argv)
