@@ -2,6 +2,8 @@
 
 namespace BiebelBier\SpookyBibleStuff;
 
+use function WortDingsda\write;
+
 include_once "BibleChapter.php";
 include_once "BibleFile.php";
 include_once "BibleVersion.php";
@@ -201,6 +203,7 @@ class BibleCli
                     break;
                 case '3':
                     $this->showMostCommonWords($handle, $bible);
+                    break;
                 case '4':
                     $this->saveBible($handle, $bible);
                 case '5':
@@ -332,9 +335,42 @@ class BibleCli
         fgets($handle);
     }
 
-    private function showMostCommonWords($handle, mixed $bible)
+    private function showMostCommonWords($handle, BibleVersion $bible)
     {
         system('clear');
         $this->write("Die häufigsten Wörter in dieser Biebel sind:", '');
+        $wordDict = [];
+        foreach ($bible->getChapters() as $chapter) {
+            /** @var BibleChapter $chapter*/
+            foreach ($chapter->getFiles() as $file) {
+                /** @var BibleFile $file*/
+                foreach ($file->getLines() as $line) {
+                    foreach (explode(' ', $line) as $word) {
+                        $word = trim($word, "\ \t\n\r\0\x0B!?,.;:-_#");
+                        if (!empty($wordDict[$word])) {
+                            $wordDict[$word] = $wordDict[$word] + 1;
+                        } else {
+                            $wordDict[$word] = 1;
+                        }
+                    }
+                }
+            }
+        }
+        arsort($wordDict);
+        $col = 'blue';
+        $c = 1;
+        foreach ($wordDict as $word => $count) {
+            $this->write("\t".$count."\t\t".$word, $col);
+            if ($col == 'blue') {
+                $col = 'green';
+            } else {
+                $col = 'blue';
+            }
+            $c += 1;
+            if ($c >= 20) {
+                break;
+            }
+        }
+        $in = fgets($handle);
     }
 }

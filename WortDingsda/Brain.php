@@ -122,7 +122,7 @@ class Brain
         foreach ($info as $singleInfo) {
             $scoreAdd = $winner[1] + $singleInfo[1];
             $randInt = random_int(0, $scoreAdd);
-            if ($randInt > $winner[1]) {
+            if ($randInt < $winner[1]) { // hier normal >, nicht <
                 $winner = $singleInfo;
             }
         }
