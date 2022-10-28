@@ -158,10 +158,10 @@ function canBePlaced($x, $y, $val, $grid): bool
     return false;
 }
 
-generate('csv');
+echo(generate('csv'));
 
-@mkdir('out');
-for ($i = 0; $i < 1000; $i++) {
-    $time = microtime(true);
-    file_put_contents('out/'.str_replace(['.', ','], '', $time).'.csv', generate('csv'));
-}
+//@mkdir('out');
+//for ($i = 0; $i < 1000; $i++) {
+//    $time = microtime(true);
+//    file_put_contents('out/'.str_replace(['.', ','], '', $time).'.csv', generate('csv'));
+//}
