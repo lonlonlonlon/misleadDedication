@@ -33,7 +33,7 @@ function valInRow(int $x, int $val, $grid): bool
     return false;
 }
 
-function valInCol(int $y, int $val): bool
+function valInCol(int $y, int $val, $grid): bool
 {
     if (!validateCoord($y) || !validateValue($val)) {
         throw new \Exception("Invalid value in [y:$y, val:$val]");
@@ -48,7 +48,7 @@ function valInCol(int $y, int $val): bool
     return false;
 }
 
-function valInBox($x, $y, $val): bool
+function valInBox($x, $y, $val, $grid): bool
 {
     if (!validateCoord($x) || !validateCoord($y) || !validateValue($val)) {
         throw new \Exception("Invalid value in [x:$x, y:$y, val:$val]");
@@ -104,11 +104,64 @@ function toCsv(array $grid): string
     return $csvString;
 }
 
-function generate() {
+function generate(string $format) {
     $grid = getEmptyGrid();
-    genRecur(0, 0, $grid);
+    $grid = genRecur(0, 0, $grid);
+    if (strtolower($format) == 'csv') {
+        return toCsv($grid);
+    }
+    return "unsupported output format";
 }
 
-function genRecur() {
+function genRecur($x, $y, $grid) {
+    $couldBePlaced = false;
+    foreach (getRandValArray() as $possibleValue) {
+        if (canBePlaced($x, $y, $possibleValue, $grid)) {
+            $couldBePlaced = true;
+            $grid[$x][$y] = $possibleValue;
+            $newY = $y;
+            $newX = $x;
+            if ($y == 8) {
+                $newY = 0;
+                $newX += 1;
+                if ($newX == 9) {
+                    return $grid;
+                }
+            } else {
+                $newY += 1;
+            }
+            $newGrid = genRecur($newX, $newY, $grid);
+            if (gettype($newGrid) == 'array') {
+                $grid = $newGrid;
+            } else {
+                $couldBePlaced = false;
+                continue;
+            }
+        }
+    }
+    if ($couldBePlaced) {
+        return $grid;
+    } else {
+        return false;
+    }
+}
 
+function canBePlaced($x, $y, $val, $grid): bool
+{
+    if (
+        !valInRow($x, $val, $grid) &&
+        !valInCol($y, $val, $grid) &&
+        !valInBox($x, $y, $val, $grid)
+    ) {
+        return true;
+    }
+    return false;
+}
+
+generate('csv');
+
+@mkdir('out');
+for ($i = 0; $i < 1000; $i++) {
+    $time = microtime(true);
+    file_put_contents('out/'.str_replace(['.', ','], '', $time).'.csv', generate('csv'));
 }
