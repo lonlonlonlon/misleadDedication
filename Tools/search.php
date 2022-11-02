@@ -21,8 +21,6 @@ class Search {
     public bool $caseSensitive = true;
     public bool $justNames = false;
     public bool $hideErrors = false;
-    public bool $ztsEnabled = false;
-    public const RUNTIME_CLASS = '\parallel\Runtime';
 
 
     public function __construct($argv)
@@ -31,10 +29,6 @@ class Search {
             if(! $index == 0){
                 $this->parseArg($arg, $index);
             }
-        }
-        // check for zts and parallel
-        if (class_exists('parallel\Runtime')) {
-            $this->ztsEnabled = true;
         }
         $this->doMagic();
     }
@@ -219,7 +213,6 @@ function recur($path, $searchString, $search)
                     $search->write(EXCLUDED . " $path$item");
                     continue;
                 }
-                if ($search->ztsEnabled) // TODO: hier weitermachen, fallunterscheidung wenn zts dann threads aufmachen
                 doStuff($path . $item . "/", $searchString, $search);
             }
             // check if file, if yes read and search for string
