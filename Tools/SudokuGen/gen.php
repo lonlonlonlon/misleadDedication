@@ -158,7 +158,25 @@ function canBePlaced($x, $y, $val, $grid): bool
     return false;
 }
 
+function getPossibleSolutions($grid): array
+{
+    return solRecur($grid, []);
+}
+
+function solRecur($grid, array $array): bool|array
+{
+    foreach ($grid as $x => $row) {
+        foreach ($row as $y => $value) {
+            if (empty($value)) {
+                $rndVals = getRandValArray();
+            }
+        }
+    }
+}
+
 echo(generate('csv'));
+
+
 
 //@mkdir('out');
 //for ($i = 0; $i < 1000; $i++) {
