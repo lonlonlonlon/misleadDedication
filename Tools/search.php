@@ -30,6 +30,10 @@ class Search {
                 $this->parseArg($arg, $index);
             }
         }
+        // check for zts and parallel
+        if (class_exists('parallel\Runtime')) {
+
+        }
         $this->doMagic();
     }
 
