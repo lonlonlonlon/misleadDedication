@@ -201,6 +201,7 @@ function recur($path, $searchString, $search)
             }
             return;
         }
+        $threads = [];
         foreach ($dirContent as $item) {
             if ($item == "." || $item == "..") {
                 continue;
@@ -289,6 +290,9 @@ function recur($path, $searchString, $search)
     }
     doStuff($path, $searchString, $search);
 }
+
+set_time_limit(0);
+ini_set('memory_limit', '2G');
 
 $search = new Search($argv);
 ?>

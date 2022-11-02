@@ -6,9 +6,8 @@ class LFify
 
     public function __construct($argv)
     {
-        var_dump($argv);
         foreach ($argv as $index => $arg) {
-            if (!$index === 0) {
+            if (!$index == 0) {
                 $this->parseArg($arg, $index);
             }
         }
@@ -17,7 +16,6 @@ class LFify
 
     private function parseArg($arg, $index)
     {
-        echo("$index: $arg\n");
         if($index === 1) {
             $this->path = $arg;
         }
@@ -31,7 +29,9 @@ class LFify
 
 function recur($path)
 {
-    echo("$path\n");
+    if (!str_ends_with($path, '/')) {
+        $path .= '/';
+    }
     function doStuff($path) {
         @$dirContent = scandir($path);
         if(empty($dirContent)) {
@@ -48,7 +48,6 @@ function recur($path)
             }
             // check if file, if yes LFify it
             system("dos2unix $path$item");
-            echo("LFified $path$item\n");
         }
     }
     doStuff($path);
