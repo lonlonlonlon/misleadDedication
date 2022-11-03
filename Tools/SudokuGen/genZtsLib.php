@@ -278,6 +278,9 @@ function generateSudoku($numPossibleSolutions = 1, $format = 'csv') {
     if (strtolower($format) == 'php') {
         return $grid;
     }
+//    if (strtolower($format) == 'png') {
+//        return
+//    }
     return "unsupported output format";
 }
 
