@@ -151,7 +151,7 @@ function canBePlaced($x, $y, $val, $grid): bool
     return false;
 }
 
-function getPossibleSolutions($grid): array
+function getPossibleSolutions($grid): bool|array
 {
     return solRecur($grid, []);
 }
@@ -166,9 +166,11 @@ function solRecur($grid, array $array): bool|array
     foreach ($grid as $x => $row) {
         foreach ($row as $y => $value) {
             if (empty($value)) {
-                $rndVals = [1,2,3,4,5,6,7,8,9];
+                $rndVals = getRandValArray();
+                $couldPlace = false;
                 foreach ($rndVals as $rndVal) {
                     if (canBePlaced($x, $y, $rndVal, $grid)) {
+                        $couldPlace = true;
                         $tmpGrid = $grid;
                         $tmpGrid[$x][$y] = $rndVal;
                         $tmp = solRecur($tmpGrid, $array);
@@ -177,13 +179,30 @@ function solRecur($grid, array $array): bool|array
                             foreach ($tmp as $hash => $tmpGrid){
                                 $array[$hash] = $tmpGrid;
                             }
+                        } else {
+                            if (empty($array)) {
+                                return false;
+                            } else {
+                                return $array;
+                            }
                         }
+                    }
+                }
+                if (!$couldPlace){
+                    if (empty($array)) {
+                        return false;
+                    } else {
+                        return $array;
                     }
                 }
             }
         }
     }
-    return $array;
+    if (empty($array)) {
+        return false;
+    } else {
+        return $array;
+    }
 }
 
 function isFilled($grid): bool
@@ -220,7 +239,8 @@ $start = microtime(true);
 $sols = getPossibleSolutions(json_decode($json));
 $end = microtime(true);
 echo("Took ".($end-$start)." secs.\n");
-foreach ($sols as $solution) {
+foreach ($sols as $hash => $solution) {
+    echo($hash.":\n");
     echo (json_encode($solution).PHP_EOL);
 }
 
