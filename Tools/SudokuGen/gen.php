@@ -110,6 +110,9 @@ function generate(string $format) {
     if (strtolower($format) == 'csv') {
         return toCsv($grid);
     }
+    if (strtolower($format) == 'json') {
+        return json_encode($grid);
+    }
     return "unsupported output format";
 }
 
@@ -165,17 +168,59 @@ function getPossibleSolutions($grid): array
 
 function solRecur($grid, array $array): bool|array
 {
+    if (isFilled($grid)) {
+        $array[] = $grid;
+        return $array;
+    }
     foreach ($grid as $x => $row) {
         foreach ($row as $y => $value) {
             if (empty($value)) {
                 $rndVals = getRandValArray();
+                foreach ($rndVals as $rndVal) {
+                    if (canBePlaced($x, $y, $rndVal, $grid)) {
+                        $tmpGrid = $grid;
+                        $tmpGrid[$x][$y] = $rndVal;
+                        $tmp = solRecur($tmpGrid, $array);
+                        if (gettype($tmp) == 'array') {
+//                            $array[] = $tmp;
+                            $array = array_merge($array, $tmp);
+                        }
+                    }
+                }
             }
         }
     }
+    return $array;
 }
 
-echo(generate('csv'));
+function isFilled($grid): bool
+{
+    foreach ($grid as $x => $row) {
+        foreach ($row as $y => $val) {
+            if (empty($val)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
+$json = "
+[[7,9,8,6,\"\",5,3,2,4],
+[5,1,3,4,9,2,6,8,7],
+[6,2,4,8,3,7,1,5,9],
+[2,6,9,5,8,3,7,4,1],
+[4,5,7,2,\"\",1,8,9,3],
+[8,3,1,9,7,4,2,6,5],
+[3,4,5,7,2,8,9,1,6],
+[9,7,\"\",1,5,6,4,3,8],
+[1,8,6,3,4,9,5,7,2]]";
+
+//echo(generate('json'));
+$sols = getPossibleSolutions(json_decode($json));
+foreach ($sols as $solution) {
+    echo (json_encode($solution).PHP_EOL);
+}
 
 
 //@mkdir('out');
