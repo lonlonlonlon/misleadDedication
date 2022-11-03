@@ -2,7 +2,6 @@
 
 namespace Sudoku;
 
-
 function getEmptyGrid(): array
 {
     for ($x = 0; $x < 9; $x++) {
@@ -22,9 +21,6 @@ function getRandValArray(): array
 
 function valInRow(int $x, int $val, $grid): bool
 {
-    if (!validateCoord($x) || !validateValue($val)) {
-        throw new \Exception("Invalid value in [x:$x, val:$val]");
-    }
     foreach ($grid[$x] as $value) {
         if ($value == $val) {
             return true;
@@ -35,9 +31,6 @@ function valInRow(int $x, int $val, $grid): bool
 
 function valInCol(int $y, int $val, $grid): bool
 {
-    if (!validateCoord($y) || !validateValue($val)) {
-        throw new \Exception("Invalid value in [y:$y, val:$val]");
-    }
     foreach ($grid as $row) {
         foreach ($row as $yIndex => $value) {
             if ($yIndex == $y && $val == $value) {
@@ -50,9 +43,6 @@ function valInCol(int $y, int $val, $grid): bool
 
 function valInBox($x, $y, $val, $grid): bool
 {
-    if (!validateCoord($x) || !validateCoord($y) || !validateValue($val)) {
-        throw new \Exception("Invalid value in [x:$x, y:$y, val:$val]");
-    }
     $boxX = floor($x / 3);
     $boxY = floor($y / 3);
     foreach ($grid as $xGrid => $row) {
@@ -169,21 +159,24 @@ function getPossibleSolutions($grid): array
 function solRecur($grid, array $array): bool|array
 {
     if (isFilled($grid)) {
-        $array[] = $grid;
+        $hash = sha1(implode_r('_', $grid));
+        $array[$hash] = $grid; // TODO: hier weitermachen
         return $array;
     }
     foreach ($grid as $x => $row) {
         foreach ($row as $y => $value) {
             if (empty($value)) {
-                $rndVals = getRandValArray();
+                $rndVals = [1,2,3,4,5,6,7,8,9];
                 foreach ($rndVals as $rndVal) {
                     if (canBePlaced($x, $y, $rndVal, $grid)) {
                         $tmpGrid = $grid;
                         $tmpGrid[$x][$y] = $rndVal;
                         $tmp = solRecur($tmpGrid, $array);
+                        unset($tmpGrid);
                         if (gettype($tmp) == 'array') {
-//                            $array[] = $tmp;
-                            $array = array_merge($array, $tmp);
+                            foreach ($tmp as $hash => $tmpGrid){
+                                $array[$hash] = $tmpGrid;
+                            }
                         }
                     }
                 }
@@ -205,19 +198,28 @@ function isFilled($grid): bool
     return true;
 }
 
+function implode_r($concattinator, $array) {
+    return is_array($array) ?
+        implode($concattinator, array_map(__FUNCTION__, array_fill(0, count($array), $concattinator), $array)) :
+        $array;
+}
+
 $json = "
 [[7,9,8,6,\"\",5,3,2,4],
 [5,1,3,4,9,2,6,8,7],
-[6,2,4,8,3,7,1,5,9],
+[6,\"\",4,8,3,7,\"\",5,9],
 [2,6,9,5,8,3,7,4,1],
 [4,5,7,2,\"\",1,8,9,3],
-[8,3,1,9,7,4,2,6,5],
+[\"\",3,\"\",9,7,4,2,6,5],
 [3,4,5,7,2,8,9,1,6],
 [9,7,\"\",1,5,6,4,3,8],
-[1,8,6,3,4,9,5,7,2]]";
+[1,\"\",6,3,4,9,5,\"\",2]]";
 
 //echo(generate('json'));
+$start = microtime(true);
 $sols = getPossibleSolutions(json_decode($json));
+$end = microtime(true);
+echo("Took ".($end-$start)." secs.\n");
 foreach ($sols as $solution) {
     echo (json_encode($solution).PHP_EOL);
 }
