@@ -2,6 +2,8 @@
 
 namespace Sudoku;
 
+use parallel\Runtime;
+
 function getEmptyGrid(): array
 {
     for ($x = 0; $x < 9; $x++) {
@@ -81,7 +83,7 @@ function toCsv(array $grid): string
     foreach ($grid as $xIndex => $row) {
         foreach ($row as $yIndex => $value) {
             if (empty($value)) {
-                $value = 'N';
+                $value = ' ';
             }
             $csvString .= $value;
             if ($yIndex == count($row) - 1) {
@@ -94,7 +96,8 @@ function toCsv(array $grid): string
     return $csvString;
 }
 
-function generate(string $format) {
+function generateFull(string $format)
+{
     $grid = getEmptyGrid();
     $grid = genFullRecur(0, 0, $grid);
     if (strtolower($format) == 'csv') {
@@ -103,10 +106,14 @@ function generate(string $format) {
     if (strtolower($format) == 'json') {
         return json_encode($grid);
     }
+    if (strtolower($format) == 'php') {
+        return $grid;
+    }
     return "unsupported output format";
 }
 
-function genRecur($x, $y, $grid) {
+function genFullRecur($x, $y, $grid)
+{
     $couldBePlaced = false;
     foreach (getRandValArray() as $possibleValue) {
         if (canBePlaced($x, $y, $possibleValue, $grid)) {
@@ -151,13 +158,18 @@ function canBePlaced($x, $y, $val, $grid): bool
     return false;
 }
 
-function getPossibleSolutions($grid): bool|array
+function getPossibleSolutions($grid, $coreCount): bool|array
 {
-    return solRecur($grid, []);
+    for ($i = 0; $i < $coreCount; $i++) {
+        $workerPool[] = new \parallel\Runtime;
+    }
+    return solRecur($grid, [], [$workerPool, 0]);
 }
 
-function solRecur($grid, array $array): bool|array
+function solRecur($grid, array $array, $threading = [false, false]): bool|array
 {
+    [$workerPool, $nextWorker] = $threading;
+    $promises = [];
     if (isFilled($grid)) {
         $hash = sha1(implode_r('_', $grid));
         $array[$hash] = $grid; // TODO: hier weitermachen
@@ -166,43 +178,55 @@ function solRecur($grid, array $array): bool|array
     foreach ($grid as $x => $row) {
         foreach ($row as $y => $value) {
             if (empty($value)) {
-                $rndVals = getRandValArray();
-                $couldPlace = false;
-                foreach ($rndVals as $rndVal) {
-                    if (canBePlaced($x, $y, $rndVal, $grid)) {
-                        $couldPlace = true;
-                        $tmpGrid = $grid;
-                        $tmpGrid[$x][$y] = $rndVal;
-                        $tmp = solRecur($tmpGrid, $array);
-                        unset($tmpGrid);
-                        if (gettype($tmp) == 'array') {
-                            foreach ($tmp as $hash => $tmpGrid){
-                                $array[$hash] = $tmpGrid;
-                            }
-                        } else {
-                            if (empty($array)) {
-                                return false;
-                            } else {
-                                return $array;
-                            }
-                        }
-                    }
+                $emptyVal = [$x, $y];
+            }
+        }
+    }
+    [$x, $y] = $emptyVal;
+    $rndVals = getRandValArray();
+    $candidates = [];
+    foreach ($rndVals as $rndVal) {
+        if (canBePlaced($x, $y, $rndVal, $grid)) {
+            $candidates[] = $rndVal;
+        }
+    }
+    if ($nextWorker) {
+        // parallel
+        foreach ($candidates as $rndVal) {
+            $tmpGrid = $grid;
+            $tmpGrid[$x][$y] = $rndVal;
+            $promises[] = $workerPool[$nextWorker]->run(function() use ($tmpGrid, $array) {
+                include_once 'genZtsLib.php';
+                return solRecur($tmpGrid, $array);
+            });
+            $nextWorker++; $nextWorker == count($workerPool) -1 ? $nextWorker = 0 : 1;
+        }
+        // promises holen
+        foreach ($promises as $future) {
+            $arr = $future->value();
+            foreach ($arr as $hash => $resultGrid) {
+                if (empty($array[$hash]) && !$resultGrid) {
+                    $array[$hash] = $resultGrid;
                 }
-                if (!$couldPlace){
-                    if (empty($array)) {
-                        return false;
-                    } else {
-                        return $array;
+            }
+        }
+    } else {
+        // normal
+        foreach ($candidates as $rndVal) {
+            $tmpGrid = $grid;
+            $tmpGrid[$x][$y] = $rndVal;
+            $tmp = solRecur($tmpGrid, $array);
+            unset($tmpGrid);
+            if (gettype($tmp) == 'array') {
+                foreach ($tmp as $hash => $tmpGrid){
+                    if (empty($array[$hash]) && $tmpGrid) {
+                        $array[$hash] = $tmpGrid;
                     }
                 }
             }
         }
     }
-    if (empty($array)) {
-        return false;
-    } else {
-        return $array;
-    }
+    return $array;
 }
 
 function isFilled($grid): bool
@@ -217,31 +241,44 @@ function isFilled($grid): bool
     return true;
 }
 
-function implode_r($concattinator, $array) {
+function implode_r($concattinator, $array)
+{
     return is_array($array) ?
         implode($concattinator, array_map(__FUNCTION__, array_fill(0, count($array), $concattinator), $array)) :
         $array;
 }
 
-$json = "
-[[7,9,8,6,\"\",5,3,2,4],
-[5,1,3,4,9,2,6,8,7],
-[6,\"\",4,8,3,7,\"\",5,9],
-[2,6,9,5,8,3,7,4,1],
-[4,5,7,2,\"\",1,8,9,3],
-[\"\",3,\"\",9,7,4,2,6,5],
-[3,4,5,7,2,8,9,1,6],
-[9,7,\"\",1,5,6,4,3,8],
-[1,\"\",6,3,4,9,5,\"\",2]]";
+function generateSudoku($numPossibleSolutions = 1, $format = 'csv') {
+    $grid = [];
+    do {
+        $grid = generateFull('php');
+        $tries = 50;
+        do {
+            [$x, $y] = [random_int(0, 8), random_int(0, 8)];
+            $tmpGrid = $grid;
+            $tmpGrid[$x][$y] = null;
+            if (count(getPossibleSolutions($tmpGrid, 16)) > $numPossibleSolutions) {
+                // don't do it
+                $tries--;
+                continue;
+            } else {
+                // do it
+                $grid[$x][$y] = null;
+            }
+            $tries--;
+        } while ($tries > 0);
+    } while (getPossibleSolutions($grid, 16) < $numPossibleSolutions);
 
-//echo(generate('json'));
-$start = microtime(true);
-$sols = getPossibleSolutions(json_decode($json));
-$end = microtime(true);
-echo("Took ".($end-$start)." secs.\n");
-foreach ($sols as $hash => $solution) {
-    echo($hash.":\n");
-    echo (json_encode($solution).PHP_EOL);
+    if (strtolower($format) == 'csv') {
+        return toCsv($grid);
+    }
+    if (strtolower($format) == 'json') {
+        return json_encode($grid);
+    }
+    if (strtolower($format) == 'php') {
+        return $grid;
+    }
+    return "unsupported output format";
 }
 
 
