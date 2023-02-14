@@ -182,6 +182,7 @@ class Search {
                 if(str_ends_with($item, "/")) {
                     $toExcludeTmp[$index] = rtrim($item, "/");
                 }
+                $toExcludeTmp[$index] = trim($toExcludeTmp[$index], '\'"');
             }
         } else {
             // count($toExclude) == 1
@@ -189,6 +190,7 @@ class Search {
             if(str_ends_with($toExcludeTmp[0], "/")) {
                 $toExcludeTmp[0] = rtrim($toExcludeTmp[0], "/");
             }
+            $toExcludeTmp[0] = trim($toExcludeTmp[0], '\'"');
         }
         $this->toExclude = $toExcludeTmp;
     }
