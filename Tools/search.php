@@ -21,6 +21,7 @@ class Search {
     public bool $caseSensitive = true;
     public bool $justNames = false;
     public bool $hideErrors = false;
+    public bool $showLines = false;
 
 
     public function __construct($argv)
@@ -60,6 +61,8 @@ class Search {
             $this->write("\tdon't search file contents");
             $this->write("-H --hide-errors");
             $this->write("\tdon't print error messages");
+            $this->write("-s --show-lines");
+            $this->write("\tshow the found lines containing STRING");
             $this->write("");
             $this->write("Example:");
             $this->write("\tphp /path/to/search.php /var/www/html BraveElephant -c -i -e \"[/var/www/html/public, /var/www/html/vendor]\"");
@@ -93,6 +96,10 @@ class Search {
             if($arg === "-H" || $arg === "--hide-errors") {
                 $this->hideErrors = true;
             }
+            if($arg === "-s" || $arg === "--show-lines") {
+                $this->showLines = true;
+            }
+
             return;
         }
     }
@@ -260,10 +267,16 @@ function recur($path, $searchString, $search)
                     if($search->caseSensitive) {
                         if (str_contains($line, $searchString)) {
                             $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
+                            if ($search->showLines) {
+                                $search->write(trim($line));
+                            }
                         }
                     } else {
                         if (stripos($line, $searchString)) {
                             $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
+                            if ($search->showLines) {
+                                $search->write(trim($line));
+                            }
                         }
                     }
                     $index = 2;
@@ -277,10 +290,16 @@ function recur($path, $searchString, $search)
                     if($search->caseSensitive) {
                         if (str_contains($line, $searchString)) {
                             $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
+                            if ($search->showLines) {
+                                $search->write(trim($line));
+                            }
                         }
                     } else {
                         if (stripos($line, $searchString)) {
                             $search->write(HIT . " in " . FILE . PINK . " $itemFileName " . CLEAR_COLOR . "at line " . CYAN . "$index" . CLEAR_COLOR);
+                            if ($search->showLines) {
+                                $search->write(trim($line));
+                            }
                         }
                     }
                     $index+=1;
