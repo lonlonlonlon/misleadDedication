@@ -32,6 +32,8 @@ clear();
 
 while (true) {
     if ($renderFrame){
+        $width = exec('tput cols')-1;
+        $height = exec('tput lines')-1;
         if ($time > $endTime) {$timeAdd = -1;}
         if ($time < $startTime) {$timeAdd = 1;}
         for ($y = 0; $y < $height; $y++) {
@@ -56,6 +58,7 @@ while (true) {
 }
 
 function getChar(int $x, int $y, int $time, int $width, int $height) {
+    // $iter = $x + $y + 1;
     $iter = 100;
     $normX = $x / $width;
     $normY = $y / $height;
