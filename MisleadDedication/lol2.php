@@ -95,7 +95,8 @@ function getChar(int $x, int $y, int $time, int $width, int $height) {
 }
 
 function clear() {
-    echo chr(27).chr(91).'H'.chr(27).chr(91).'J';
+    // echo chr(27).chr(91).'H'.chr(27).chr(91).'J';
+    system('tput cup 0 0');
 }
 
 function checkFreakout($x, $y, $remainIter, $stopAt, $xAdd, $yAdd)
