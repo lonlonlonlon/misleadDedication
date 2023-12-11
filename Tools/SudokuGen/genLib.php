@@ -270,8 +270,11 @@ function generateSudoku($numPossibleSolutions = 1, $format = 'csv') {
     if (strtolower($format) == 'json') {
         return json_encode($grid);
     }
-    if (strtolower($format) == 'php') {
+    if (strtolower($format) == 'php-array') {
         return $grid;
+    }
+    if (strtolower($format) == 'php-executable') {
+        return var_export($grid, true);
     }
 //    if (strtolower($format) == 'png') {
 //        return
