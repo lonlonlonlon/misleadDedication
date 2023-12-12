@@ -31,4 +31,4 @@ include_once("genLib.php");
 //    echo (json_encode($solution).PHP_EOL);
 //}
 
-echo(generateSudoku());
+echo(generateSudoku(1, 'php-executable'));
