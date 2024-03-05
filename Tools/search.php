@@ -313,7 +313,7 @@ function recur($path, $searchString, $search)
 }
 
 set_time_limit(0);
-ini_set('memory_limit', '2G');
+ini_set('memory_limit', '20G');
 
 $search = new Search($argv);
 ?>
