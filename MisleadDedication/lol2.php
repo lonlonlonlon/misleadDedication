@@ -38,7 +38,7 @@ while (true) {
         if ($time < $startTime) {$timeAdd = 1;}
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                $displayString .= getChar($x, $y, $time, $width, $height);
+                $displayString .= getIntensity($x, $y, $time, $width, $height);
             }
             $displayString .= PHP_EOL;
         }

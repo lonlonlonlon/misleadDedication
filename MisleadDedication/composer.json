@@ -1,0 +1,10 @@
+{
+    "require": {
+        "amphp/parallel-functions": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Brot\\": "."
+        }
+    }
+}

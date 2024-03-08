@@ -1,6 +1,6 @@
 <?php
 system('clear');
-ini_set('memory_limit', '20G');
+ini_set('memory_limit', '26G');
 try {
     $brotFile = eval('return '.file_get_contents($argv[1]).';');
     while (1) {
