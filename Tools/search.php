@@ -22,6 +22,8 @@ class Search {
     public bool $justNames = false;
     public bool $hideErrors = false;
     public bool $showLines = false;
+    public bool $excludeDotfiles = false;
+    public bool $showProgress = false;
 
 
     public function __construct($argv)
@@ -63,6 +65,10 @@ class Search {
             $this->write("\tdon't print error messages");
             $this->write("-s --show-lines");
             $this->write("\tshow the found lines containing STRING");
+            $this->write("-d --exclude-dotfiles");
+            $this->write("\texclude dotfiles and folders");
+            $this->write("-p --show-progress");
+            $this->write("\tcalculate folder size before search to show progressbar");
             $this->write("");
             $this->write("Example:");
             $this->write("\tphp /path/to/search.php /var/www/html BraveElephant -c -i -e \"[/var/www/html/public, /var/www/html/vendor]\"");
@@ -99,7 +105,12 @@ class Search {
             if($arg === "-s" || $arg === "--show-lines") {
                 $this->showLines = true;
             }
-
+            if($arg === "-d" || $arg === "--exclude-dotfiles") {
+                $this->excludeDotfiles = true;
+            }
+            if($arg === "-p" || $arg === "--show-progress") {
+                $this->showProgress = true;
+            }
             return;
         }
     }
@@ -147,6 +158,12 @@ class Search {
         if(! str_ends_with($this->path, "/")) {
             $this->path = $this->path."/";
         }
+
+        // du -s => kebibyte
+//        if ($this->showProgress) {
+//            $this->toSearchKebibyte = trim(shell_exec("du -s".$this->path));
+//        }
+
         $startTime = microtime(true);
         recur($this->path, $this->searchString, $this);
         $endTime = microtime(true);
@@ -213,6 +230,10 @@ function recur($path, $searchString, $search)
         $threads = [];
         foreach ($dirContent as $item) {
             if ($item == "." || $item == "..") {
+                continue;
+            }
+            if ($search->excludeDotfiles && str_starts_with($item, '.')) {
+                $search->write(EXCLUDED . " $path$item");
                 continue;
             }
             // check if dir, if yes recur
