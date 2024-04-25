@@ -4,13 +4,13 @@ namespace consoleRPG\src;
 
 class Player
 {
-    private int $xPos;
-    private int $yPos;
-    private string $displayString;
+    private int $xPos = 1;
+    private int $yPos = 1;
+    private string $displayString = TERM_FORE_YELLOW.'🯅';
 
-    public function __construct(Game $game)
+    public function __construct(private readonly Game $game)
     {
-        $game->addEventlistener();
+
     }
 
     public function getXPos(): int
@@ -44,5 +44,38 @@ class Player
     {
         $this->displayString = $displayString;
         return $this;
+    }
+
+    private function attemptToMoveTo(int $x, int $y)
+    {
+        $map = $this->game->getMap();
+        $targetTile = $map->getTile($x, $y);
+        $debugString = "attempt to move to x:$x y:$y. Tile walkable: ".($targetTile->isWalkable()?1:0) .".\n";
+        file_put_contents('debug.log', $debugString, FILE_APPEND);
+        if ($targetTile->isWalkable()) {
+            $this->xPos = $x;
+            $this->yPos = $y;
+            $this->game->dispatchEvent(new Event($this->game, "playerMove", ['x' => $this->xPos, 'y' => $this->yPos]));
+        }
+    }
+
+    public function moveUp()
+    {
+        $this->attemptToMoveTo($this->getXPos(), $this->getYPos()-1);
+    }
+
+    public function moveDown()
+    {
+        $this->attemptToMoveTo($this->getXPos(), $this->getYPos()+1);
+    }
+
+    public function moveLeft()
+    {
+        $this->attemptToMoveTo($this->getXPos()-1, $this->getYPos());
+    }
+
+    public function moveRight()
+    {
+        $this->attemptToMoveTo($this->getXPos()+1, $this->getYPos());
     }
 }

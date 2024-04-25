@@ -1,0 +1,47 @@
+{
+  "legend": {
+    "1": {
+      "name": "border1",
+      "walkable": false,
+      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE.", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE+", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#"]
+    },
+    "g": {
+      "name": "grass",
+      "walkable": true,
+      "display": ["TERM_FORE_LIGHT_GREENTERM_BACK_GREEN_DARK,"]
+    },
+    "s": {
+      "name": "stone",
+      "walkable": false,
+      "display": ["TERM_FORE_WHITETERM_BACK_WHITE_DARKS"]
+    },
+    "2": {
+      "name": "border2",
+      "walkable": false,
+      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE+", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE."]
+    },
+    "3": {
+      "name": "border2",
+      "walkable": false,
+      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE.", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE+"]
+    }
+  },
+  "map": [
+    "1231231231231231231231231231231231231231",
+    "1gggggggggggggggggggggggggggggggggggggg2",
+    "2ggggggggggggggsggggggggggggggggggggggg3",
+    "3gggggggsgggggggggggggggggggggggggggggg1",
+    "1gggggggggggggggggggggggggggggggggggggg2",
+    "2ggggggggggsggggggggggggggggggggggggggg3",
+    "3gggggggggggggggggggggggggggggggggggggg1",
+    "1ggggsgggggggsggggggggggggggggggggggggg2",
+    "2ggggggggggsggggggggggggggggggggggggggg3",
+    "3gggggggggggggggggggggggggggggggggggggg1",
+    "1ggggsgggggggsggggggggggggggggggggggggg2",
+    "2ggggggggggsggggggggggggggggggggggggggg3",
+    "3gggggggggggggggggggggggggggggggggggggg1",
+    "1ggggsgggggggsggggggggggggggggggggggggg2",
+    "2gggggggggggggggggggggggggggggggggggggg3",
+    "1321321321321321321321321321321321321321"
+  ]
+}

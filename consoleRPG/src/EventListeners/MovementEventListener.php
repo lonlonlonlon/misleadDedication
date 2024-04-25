@@ -2,6 +2,8 @@
 
 namespace consoleRPG\src\EventListeners;
 
+use consoleRPG\src\Event;
+
 class MovementEventListener implements \consoleRPG\src\EventListener
 {
 
@@ -10,8 +12,21 @@ class MovementEventListener implements \consoleRPG\src\EventListener
         return ['key'];
     }
 
-    public function handleEvent(\consoleRPG\src\Event $event)
+    public function handleEvent(Event $event)
     {
-        echo $event->getData()['key'];
+        $key = $event->getData()['key'];
+        $player = $event->getGame()->getPlayer();
+        if ($key === 'w') {
+            $player->moveUp();
+        }
+        if ($key === 'a') {
+            $player->moveLeft();
+        }
+        if ($key === 's') {
+            $player->moveDown();
+        }
+        if ($key === 'd') {
+            $player->moveRight();
+        }
     }
 }

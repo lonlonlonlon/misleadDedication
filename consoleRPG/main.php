@@ -10,9 +10,8 @@ foreach (glob("src/*.php") as $filename)
     include $filename;
 }
 
-// konsole -e command
 use consoleRPG\src\Game;
 
-exec('konsole -e php src/inputListener.php > /dev/null &');
-
+// worker für input starten
+exec('bash -c "exec nohup setsid konsole -e php src/inputListener.php > /dev/null 2>&1 &"');
 $game = new Game();

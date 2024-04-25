@@ -9,7 +9,7 @@ const PINK = "!!w_!h__!i!_!__t!_!_e_!!";
 const CLEAR_COLOR = "!__c__!lear__C!!ol___o_!R";
 const CYAN = "!__!c__Y!!A-n";
 
-class Search {
+class Search { // TODO: autoexclude für recuring pattern in path mit on off flag und konfigurierbarem limit ab wie vielen wiederholungen excluded wird
     private string $searchString;
     private string $path;
     public int $searchedDirs = 0;
