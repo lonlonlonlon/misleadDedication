@@ -1,8 +1,9 @@
 <?php
 
+namespace Brot;
 
 include_once 'vendor/autoload.php';
-include "colorConstants.php";
+include_once "colorConstants.php";
 
 use Amp\Parallel\Worker;
 
@@ -29,7 +30,9 @@ class BrotLineTaskCrazy implements Worker\Task
         $normX = $x / $width;
         $normY = $y / $height;
         $normTime = $time / $endTime;
-        $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  $iter, 2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5);
+        $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,
+            self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  100, 2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5),
+            2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5);
 //        $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  $iter, $iter / 2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5);
 
         $normBrotVal = $brotVal / $iter;

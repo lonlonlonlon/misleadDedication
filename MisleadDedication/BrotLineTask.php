@@ -3,7 +3,7 @@
 namespace Brot;
 
 include_once 'vendor/autoload.php';
-include "colorConstants.php";
+include_once "colorConstants.php";
 
 use Amp\Parallel\Worker;
 
@@ -30,11 +30,9 @@ class BrotLineTask implements Worker\Task
         $normX = $x / $width;
         $normY = $y / $height;
         $normTime = $time / $endTime;
-        if ($time > 0) {
-            $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  $iter, 2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5);
-        } else {
-            $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  $iter, 2, $normTime * $normY * 3 - 0.5, $normTime * $normX * 3 + 0.5);
-        }
+        $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  $iter, 2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5);
+//        $brotVal = self::checkFreakout(($normX * 2.5) - 1.5, ($normY * 2) - 1,  $iter, $iter / 2, $normTime * $normX * 3 - 0.5, $normTime * $normY * 3 + 0.5);
+
         $normBrotVal = $brotVal / $iter;
         if ($normBrotVal < 0.1) {
             return WHITE_LIGHT." \033[0m";

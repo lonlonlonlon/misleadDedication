@@ -6,6 +6,7 @@ include "colorConstants.php";
 use Amp\Future;
 use Amp\Parallel\Worker;
 use Brot\BrotLineTask;
+use Brot\BrotLineTaskCrazy;
 use function Amp\async;
 use function Amp\Parallel\Worker\workerPool;
 
@@ -19,7 +20,7 @@ $timeAdd = 2;
 $displayString = "";
 $renderFrame = true;
 $loopWritten = false;
-define('ITERATIONS', 70);
+define('ITERATIONS', 120);
 $saveOutput = false;
 define('OUT_FILE_NAME', 'brot_'.(new DateTime)->format('Y-m-d__H-i-s').'.array');
 //file_put_contents(OUT_FILE_NAME, 'array(');
@@ -38,6 +39,12 @@ foreach ($argv as $index => $value) {
 }
 define('SAVE_OUTPUT', $saveOutput);
 
+if (null !== $argv[1] && $argv[1] === 'crazy') {
+    $taskClass = "Brot\BrotLineTaskCrazy";
+} else {
+    $taskClass = "Brot\BrotLineTask";
+}
+
 while (true) {
     $taskList = [];
     if ($time > $endTime) {$timeAdd *= -1;}
@@ -50,7 +57,7 @@ while (true) {
         $params->height = $height;
         $params->endTime = $endTime;
         $params->iterations = ITERATIONS;
-        $taskList[$y] = $workerPool->submit(new BrotLineTask($params));
+        $taskList[$y] = $workerPool->submit(new $taskClass($params));
     }
     foreach ($taskList as $task) {
         /** @var Worker\Execution $task */
