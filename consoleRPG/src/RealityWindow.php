@@ -10,17 +10,12 @@ class RealityWindow
     private int $bottomRightY = 0;
     private int $width = 20;
     private int $height = 10;
+    private array $centerCoordinates = [10, 5];
 
-    public function setTopLeft(int $x, int $y)
+    public function __construct(int $width = 20, int $height = 10)
     {
-        $this->topLeftX = $x;
-        $this->topLeftY = $y;
-    }
-
-    public function setBottomRight(int $x, int $y)
-    {
-        $this->bottomRightX = $x;
-        $this->bottomRightY = $y;
+        $this->width = $width;
+        $this->height = $height;
     }
 
     public function getTopLeftX(): int
@@ -43,32 +38,17 @@ class RealityWindow
         return $this->bottomRightY;
     }
 
-    public function setTopLeftX(int $topLeftX): RealityWindow
-    {
-        $this->topLeftX = $topLeftX;
-        return $this;
-    }
-
-    public function setTopLeftY(int $topLeftY): RealityWindow
-    {
-        $this->topLeftY = $topLeftY;
-        return $this;
-    }
-
-    public function setBottomRightX(int $bottomRightX): RealityWindow
-    {
-        $this->bottomRightX = $bottomRightX;
-        return $this;
-    }
-
-    public function setBottomRightY(int $bottomRightY): RealityWindow
-    {
-        $this->bottomRightY = $bottomRightY;
-        return $this;
-    }
-
     public function adjustTo(int $x, int $y)
     {
-//        $middle = $this->
+        $this->centerCoordinates = [$x, $y];
+        $this->topLeftX = $x - $this->width/2;
+        $this->topLeftY = $y - $this->height/2;
+        $this->bottomRightX = $x + $this->width/2 +1;
+        $this->bottomRightY = $y + $this->width/2 -2;
+
+        if ($this->topLeftX < 0) {$this->topLeftX = 0;}
+        if ($this->topLeftY < 0) {$this->topLeftY = 0;}
+        if ($this->bottomRightX < 0) {$this->bottomRightX = 0;}
+        if ($this->bottomRightY < 0) {$this->bottomRightY = 0;}
     }
 }

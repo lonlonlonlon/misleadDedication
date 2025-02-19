@@ -28,8 +28,7 @@ class Game
         $this->map = $this->maps['test'];
 
         $this->realityWindow = new RealityWindow();
-        $this->realityWindow->setTopLeft(0, 0);
-        $this->realityWindow->setBottomRight(20, 20);
+        $this->realityWindow->adjustTo($this->player->getXPos(), $this->player->getYPos());
 
         // Event handler laden
         foreach (scandir('src/EventListeners/') as $listenerFilename) {
@@ -143,9 +142,19 @@ class Game
 
     private function draw()
     {
+        $yMax = $this->realityWindow->getBottomRightY();
+        $xMax = $this->realityWindow->getBottomRightX();
+        $yMin = $this->realityWindow->getTopLeftY();
+        $xMin = $this->realityWindow->getTopLeftX();
+        var_dump([
+            '$yMax' => $yMax,
+            '$xMax' => $xMax,
+            '$yMin' => $yMin,
+            '$xMin' => $xMin,
+        ]);
         /** @var Map $this->map*/
-        for ($y = $this->realityWindow->getTopLeftY(); $y < $this->realityWindow->getBottomRightY(); $y++) {
-            for ($x = $this->realityWindow->getTopLeftX(); $x < $this->realityWindow->getBottomRightX(); $x++) {
+        for ($y = $yMin; $y < $yMax; $y++) {
+            for ($x = $xMin; $x < $xMax; $x++) {
                 /** @var Tile $tile */
                 if ($x+1 > $this->map->getWidth() || $y+1 > $this->map->getHeight()) {continue;}
                 $tile = $this->map->getTile($x, $y);
@@ -155,6 +164,7 @@ class Game
                     echo $tile->getDisplayString().TERM_RESET;
                 }
             }
+            if ($y == $yMax-1) {continue;}
             echo TERM_RESET."\n";
         }
     }
