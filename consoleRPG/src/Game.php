@@ -38,7 +38,7 @@ class Game
             $this->eventListeners[] = new $listenerClassName();
         }
 
-        $this->prepareSocket();
+//        $this->prepareSocket();
 
         $this->mainLoop();
     }
@@ -69,13 +69,26 @@ class Game
         $this->player = $player;
         return $this;
     }
-
+//    private function non_block_read($fd, &$data) {
+//        $read = array($fd);
+//        $write = array();
+//        $except = array();
+//        $result = stream_select($read, $write, $except, 0);
+//        if($result === false) throw new \Exception('stream_select failed');
+//        if($result === 0) return false;
+//        $data = stream_get_line($fd, 1);
+//        return true;
+//    }
     private function mainLoop()
     {
         $in = '';
+        $stdIn = fopen('php://stdin', 'r');
         while (1) {
-            socket_recv($this->sockConnection, $in, 1, MSG_DONTWAIT);
-            if (false !== $in) {
+//            socket_recv($this->sockConnection, $in, 1, MSG_DONTWAIT);
+            // TODO: get inputs
+            $in = fgetc($stdIn);
+
+            if (false !== $in && "" !== $in) {
                 $this->dispatchEvent(new Event($this, 'key', ['key' => $in]));
             }
 
@@ -146,12 +159,12 @@ class Game
         $xMax = $this->realityWindow->getBottomRightX();
         $yMin = $this->realityWindow->getTopLeftY();
         $xMin = $this->realityWindow->getTopLeftX();
-        var_dump([
-            '$yMax' => $yMax,
-            '$xMax' => $xMax,
-            '$yMin' => $yMin,
-            '$xMin' => $xMin,
-        ]);
+//        var_dump([
+//            '$yMax' => $yMax,
+//            '$xMax' => $xMax,
+//            '$yMin' => $yMin,
+//            '$xMin' => $xMin,
+//        ]);
         /** @var Map $this->map*/
         for ($y = $yMin; $y < $yMax; $y++) {
             for ($x = $xMin; $x < $xMax; $x++) {

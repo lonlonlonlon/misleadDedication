@@ -1,12 +1,10 @@
 <?php
 
-foreach (glob("src/*.php") as $filename)
-{
-//    if ($filename === 'src/inputListener.php') {
-//        continue;
-//    }
-    include $filename;
-}
+include __DIR__ . '/src/IBackground.php';
+include __DIR__ . '/src/IForeground.php';
+include __DIR__ . '/src/colorDef.php';
+include __DIR__ . '/src/Backgrounds/DefaultBackground.php';
+include __DIR__ . '/src/Foregrounds/MainForeground.php';
 
 /**
  * Idee: 2 Hauptlayer, Background und Foreground. Background wird nicht ganz gezeichnet, sondern nur die Zeichen die
@@ -23,3 +21,12 @@ foreach (glob("src/*.php") as $filename)
  * 24x80
  */
 
+$foreground = new MainForeground();
+$foreground->init('', '', '');
+
+for ($x = 0; $x < 80; $x++) {
+    for ($y = 0; $y < 24; $y++) {
+        echo $foreground->getPixel($x, $y);
+    }
+    echo "\n";
+}
