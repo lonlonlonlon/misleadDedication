@@ -2,6 +2,9 @@
 
 namespace consoleRPG\src;
 
+use consoleRPG\InstanceSettings;
+use const consoleRPG\playerFilesPath;
+
 class Game
 {
     private Map $map;
@@ -108,7 +111,7 @@ class Game
                 $this->lastAnimationTime = microtime(true);
             }
 
-            if (microtime(true) > $this->lastRenderTime + 0.01) {
+            if (microtime(true) > $this->lastRenderTime + 0.05) {
                 $this->rerenderPicture = true;
             }
         }
@@ -159,12 +162,8 @@ class Game
         $xMax = $this->realityWindow->getBottomRightX();
         $yMin = $this->realityWindow->getTopLeftY();
         $xMin = $this->realityWindow->getTopLeftX();
-//        var_dump([
-//            '$yMax' => $yMax,
-//            '$xMax' => $xMax,
-//            '$yMin' => $yMin,
-//            '$xMin' => $xMin,
-//        ]);
+        $entities = $this->parseCurrentEntities();
+
         /** @var Map $this->map*/
         for ($y = $yMin; $y < $yMax; $y++) {
             for ($x = $xMin; $x < $xMax; $x++) {
@@ -173,6 +172,13 @@ class Game
                 $tile = $this->map->getTile($x, $y);
                 if ($this->player->getYPos() == $y && $this->player->getXPos() == $x) {
                     echo substr($tile->getDisplayString(), 0, -1) . $this->player->getDisplayString();
+                } elseif (key_exists("$x.$y", $entities)) {
+                    $entity = $entities["$x.$y"];
+                    switch ($entity['type']) {
+                        case "P":
+                            echo TERM_BACK_BLUE_DARK.TERM_FORE_LIGHT_RED.'P'.TERM_RESET;
+                    }
+//                    echo $tile->getDisplayString().TERM_RESET;
                 } else {
                     echo $tile->getDisplayString().TERM_RESET;
                 }
@@ -185,5 +191,17 @@ class Game
     public function getRealityWindow(): RealityWindow
     {
         return $this->realityWindow;
+    }
+
+    private function parseCurrentEntities()
+    {
+        $entities = [];
+        foreach (scandir(playerFilesPath) as $file) {
+            if (str_starts_with($file, '.') || $file == 'PLAYER_'.InstanceSettings::getPlayerName()) {continue;}
+            # datei auslesen und in array das beim render beachtet wird
+            $props = explode(';', file_get_contents(playerFilesPath.$file));
+            $entities["$props[0].$props[1]"] = ['x' => $props[0], 'y' => $props[1], 'type' =>  $props[2]];
+        }
+        return $entities;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace consoleRPG\src;
 
+use consoleRPG\Logger;
+
 class Player
 {
     private int $xPos = 1;
@@ -50,8 +52,8 @@ class Player
     {
         $map = $this->game->getMap();
         $targetTile = $map->getTile($x, $y);
-        $debugString = "attempt to move to x:$x y:$y. Tile walkable: ".($targetTile->isWalkable()?1:0) .".\n";
-        file_put_contents('debug.log', $debugString, FILE_APPEND);
+        $debugString = "attempt to move to x:$x y:$y. Tile walkable: ".($targetTile->isWalkable()?1:0);
+        Logger::debug_log($debugString);
         if ($targetTile->isWalkable()) {
             $this->xPos = $x;
             $this->yPos = $y;

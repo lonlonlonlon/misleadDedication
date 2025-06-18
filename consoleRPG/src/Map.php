@@ -2,6 +2,8 @@
 
 namespace consoleRPG\src;
 
+use consoleRPG\Logger;
+
 class Map
 {
     private object $legend;
@@ -27,6 +29,7 @@ class Map
                 }
             }
             $this->map = $tmp;
+            Logger::debug_log("Map $filepath loaded with dimensions ".count($this->map)." x ".count($this->map[0]));
         } catch (\Exception $exception) {
             echo("Failed to load Map $filepath.\n");
             throw $exception;
