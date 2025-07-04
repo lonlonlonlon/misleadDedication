@@ -3,7 +3,7 @@
     "1": {
       "name": "border1",
       "walkable": false,
-      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE.", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE+", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#"]
+      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE ", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE~", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#"]
     },
     "g": {
       "name": "grass",
@@ -18,12 +18,12 @@
     "2": {
       "name": "border2",
       "walkable": false,
-      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE+", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE."]
+      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE ", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE~"]
     },
     "3": {
       "name": "border2",
       "walkable": false,
-      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE.", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE+"]
+      "display": ["TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE~", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE#", "TERM_BACK_BLACK_LIGHTTERM_FORE_WHITE "]
     }
   },
   "map": [

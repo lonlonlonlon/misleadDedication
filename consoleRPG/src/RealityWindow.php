@@ -10,9 +10,9 @@ class RealityWindow
     private int $bottomRightY = 0;
     private int $width = 20;
     private int $height = 10;
-    private array $centerCoordinates = [20, 10];
+    private array $centerCoordinates = [10, 5];
 
-    public function __construct(int $width = 40, int $height = 20)
+    public function __construct(int $width = 20, int $height = 10)
     {
         $this->width = $width;
         $this->height = $height;

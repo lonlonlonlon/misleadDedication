@@ -2,7 +2,9 @@
 
 namespace consoleRPG\src;
 
+use consoleRPG\InstanceSettings;
 use consoleRPG\Logger;
+use const consoleRPG\playerFilesPath;
 
 class Player
 {
@@ -79,5 +81,39 @@ class Player
     public function moveRight()
     {
         $this->attemptToMoveTo($this->getXPos()+1, $this->getYPos());
+    }
+
+    public function shoot(string $direction)
+    {
+        $targetTileCoords = [];
+        switch ($direction) {
+            case 'left':
+                $targetTileCoords = ['x' => $this->getXPos()-1, 'y' =>  $this->getYPos()];
+                break;
+            case 'right':
+                $targetTileCoords = ['x' => $this->getXPos()+1, 'y' =>  $this->getYPos()];
+                break;
+            case 'up':
+                $targetTileCoords = ['x' => $this->getXPos(), 'y' =>  $this->getYPos()-1];
+                break;
+            case 'down':
+                $targetTileCoords = ['x' => $this->getXPos(), 'y' =>  $this->getYPos()+1];
+                break;
+            default:
+                return false;
+        }
+        $targetTile = $this->game->getMap()->getTile($targetTileCoords['x'], $targetTileCoords['y']);
+        if (false == $targetTile) { return false;}
+        if ($targetTile->isWalkable()) {
+             Logger::debug_log("trying to create shot for player ".InstanceSettings::getPlayerName());
+            $filename = playerFilesPath . '/SHOT_' . InstanceSettings::getPlayerName() . '_' . microtime(true);
+            $success = file_put_contents($filename, $targetTileCoords['x'].";".$targetTileCoords['y'].";S;".InstanceSettings::getPlayerName().';'.$direction);
+            if (false === $success) {
+                Logger::debug_log("failed creating shot for player ".InstanceSettings::getPlayerName());
+            }
+            InstanceSettings::addTrackedFile($filename);
+            return true;
+        }
+        return false;
     }
 }

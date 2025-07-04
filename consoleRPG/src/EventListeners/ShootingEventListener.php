@@ -4,7 +4,7 @@ namespace consoleRPG\src\EventListeners;
 
 use consoleRPG\src\Event;
 
-class MovementEventListener implements \consoleRPG\src\EventListener
+class ShootingEventListener implements \consoleRPG\src\EventListener
 {
 
     public function getSupportedEvents(): array
@@ -16,17 +16,17 @@ class MovementEventListener implements \consoleRPG\src\EventListener
     {
         $key = $event->getData()['key'];
         $player = $event->getGame()->getPlayer();
-        if ($key === 'w') {
-            $player->moveUp();
+        if ($key === "[A") {
+            $player->shoot('up');
         }
-        if ($key === 'a') {
-            $player->moveLeft();
+        if ($key === "[B") {
+            $player->shoot('down');
         }
-        if ($key === 's') {
-            $player->moveDown();
+        if ($key === "[C") {
+            $player->shoot('right');
         }
-        if ($key === 'd') {
-            $player->moveRight();
+        if ($key === "[D") {
+            $player->shoot('left');
         }
     }
 }

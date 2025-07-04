@@ -1,0 +1,19 @@
+Pfeil rechts:
+Key pressed: 
+Key pressed: [
+Key pressed: B
+
+Pfeil oben:
+Key pressed: 
+Key pressed: [
+Key pressed: C
+
+Pfeil links:
+Key pressed: 
+Key pressed: [
+Key pressed: A
+
+Pfeil unten:
+Key pressed: 
+Key pressed: [
+Key pressed: D
