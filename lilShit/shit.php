@@ -18,6 +18,10 @@ $template = "\t\t" . file_get_contents('template');
 function getWord(string $currentWord, string $currentNumber, array &$words, &$decidedWords)
 {
     if (empty($decidedWords[$currentWord.$currentNumber])) {
+        if (count($words[$currentWord]) < 1) {
+            echo "brauche mehr $currentWord.\n";
+            exit(1);
+        }
         $rnd = random_int(0, count($words[$currentWord])-1);
         $decidedWords[$currentWord.$currentNumber] = $words[$currentWord][$rnd];
         unset($words[$currentWord][$rnd]);
