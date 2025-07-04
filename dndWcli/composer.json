@@ -1,0 +1,16 @@
+{
+    "name": "lol/dnd-wcli",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "DndWcli\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "lol",
+            "email": "olbrueck.l99@gmail.com"
+        }
+    ],
+    "require": {}
+}

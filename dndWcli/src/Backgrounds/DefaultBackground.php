@@ -1,5 +1,8 @@
 <?php
 
+namespace DndWcli\Backgrounds;
+use DndWcli\IBackground;
+
 class Background implements IBackground {
     public function getPixel(int $x, int $y): string
     {

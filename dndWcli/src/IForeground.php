@@ -1,5 +1,7 @@
 <?php
 
+namespace DndWcli;
+
 interface IForeground {
     public function getPixel(int $x, int $y): null|string;
     public function nextFrame(): void;
