@@ -1,0 +1,4 @@
+cos(sin($Y - sin($X + $Y + $Y / pi() * $X)))
+sin(tan(pi() / log10(tan($X * $X + $Y + $Y))))
+cos(log10(pi() + sin(sqrt(cos(cos($Y * $X))))))
+cos(sin(sin(sqrt(cos($X + pi() * $Y - pi())))))

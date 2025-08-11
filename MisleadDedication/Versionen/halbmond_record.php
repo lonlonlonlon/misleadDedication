@@ -80,7 +80,7 @@ function getChar(int $x, int $y, int $time, int $width, int $height, int $endTim
     $normX = $x / $width;
     $normY = $y / $height;
     $normTime = $time / $endTime;
-    $brotVal = checkFreakout($normTime, - $normTime, $iter, 2, ($normX * 2.5) - 1.5, ($normY * 2) - 1);
+    $brotVal = checkFreakoutFund1($normTime, - $normTime, $iter, 2, ($normX * 2.5) - 1.5, ($normY * 2) - 1);
     $normBrotVal = $brotVal / $iter;
     if ($normBrotVal < 0.1) {
         return WHITE_LIGHT." \033[0m";

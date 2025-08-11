@@ -1,0 +1,2 @@
+# iterierend über 1000, ergebnis wird immer = x gesetzt
+tan($Y + $X + pi() * cos(tan($X * sin($X))))

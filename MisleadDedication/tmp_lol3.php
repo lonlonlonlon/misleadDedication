@@ -63,7 +63,7 @@ function getChar(int $x, int $y, int $time, int $width, int $height, int $endTim
     $normX = $x / $width;
     $normY = $y / $height;
     $normTime = $time / $endTime;
-    $brotVal = checkFreakout($normTime, - $normTime, $iter, 2, ($normX * 2.5) - 1.5, ($normY * 2) - 1);
+    $brotVal = checkFreakoutFund1($normTime, - $normTime, $iter, 2, ($normX * 2.5) - 1.5, ($normY * 2) - 1);
 //    $brotVal = checkFreakout(($normX * 3) - 1.5, ($normY * 2) -1, $iter, 2, (-$time/1000)+0.03, -$time/1000+0.01);
     $normBrotVal = $brotVal / $iter;
     if ($normBrotVal < 0.1) {
