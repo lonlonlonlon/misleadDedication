@@ -4,6 +4,10 @@
 // iteriert, in jedem Schritt $X = ergebnis der vorberechnung gesetzt
 // iterationen (1000) visualisiert
 // result musste zwischen -100 und 100 bleiben, sonst abbruch
+include_once "src/colorDef.php";
+$GLOBALS['numBackCols'] = count(BACKGROUND_COLORS);
+$GLOBALS['numForeCols'] = count(FOREGROUND_COLORS);
+
 system("clear");
 pcntl_async_signals(true);
 pcntl_signal(SIGINT, function () {
@@ -25,24 +29,6 @@ system("stty -echo");
 system("tput civis");
 stream_set_blocking(STDIN, 0);
 system("stty -icanon");
-const WHITE_DARK="\033[47m";       # White
-const YELLOW_DARK="\033[43m";      # Yellow
-const GREEN_DARK="\033[42m";       # Green
-const CYAN_DARK="\033[46m";        # Cyan
-const BLUE_DARK="\033[44m";        # Blue
-const PURPLE_DARK="\033[45m";      # Purple
-const RED_DARK="\033[41m";         # Red
-const BLACK_DARK="\033[40m";       # Black
-
-
-const BLACK_LIGHT="\033[0;100m";   # Black
-const RED_LIGHT="\033[0;101m";     # Red
-const GREEN_LIGHT="\033[0;102m";   # Green
-const YELLOW_LIGHT="\033[0;103m";  # Yellow
-const BLUE_LIGHT="\033[0;104m";    # Blue
-const PURPLE_LIGHT="\033[0;105m";  # Purple
-const CYAN_LIGHT="\033[0;106m";    # Cyan
-const WHITE_LIGHT="\033[0;107m";   # White
 
 const halfCharDown = "▄";
 const halfCharUp = "▀";
@@ -50,19 +36,29 @@ function clear() {
     // echo chr(27).chr(91).'H'.chr(27).chr(91).'J';
     system('tput cup 0 0');
 }
-function getChr(mixed $result, mixed $min, mixed $max)
+function getChr(mixed $result, mixed $min, mixed $max, $secondResult)
 {
-    $eighth = ( abs($min) + abs($max) ) / 10;
-    if ($result < $eighth) {return WHITE_LIGHT." \033[0m";}
-    if ($result < $eighth*2) {return WHITE_DARK." \033[0m";}
-    if ($result < $eighth*3) {return YELLOW_LIGHT." \033[0m";}
-    if ($result < $eighth*4) {return YELLOW_DARK." \033[0m";}
-    if ($result < $eighth*5) {return GREEN_LIGHT." \033[0m";}
-    if ($result < $eighth*6) {return GREEN_DARK." \033[0m";}
-    if ($result < $eighth*7) {return BLUE_LIGHT." \033[0m";}
-    if ($result < $eighth*8) {return BLUE_DARK." \033[0m";}
-    if ($result < $eighth*9) {return BLACK_LIGHT." \033[0m";}
-    return BLACK_DARK." \033[0m";
+    $threshold1 = ( abs($min) + abs($max) ) / $GLOBALS['numBackCols'];
+    foreach (BACKGROUND_COLORS as $i => $color) {
+        if ($result < $i * $threshold1) {
+            $first = $color;
+            break;
+        }
+    }
+    $threshold2 = ( abs($min) + abs($max) ) / $GLOBALS['numForeCols'];
+    foreach (FOREGROUND_COLORS as $i => $color) {
+        if ($secondResult < $i * $threshold2) {
+            $second = $color;
+            break;
+        }
+    }
+    if (empty($first)) {
+        $first = BACKGROUND_COLORS[$GLOBALS['numBackCols'] - 1];
+    }
+    if (empty($second)) {
+        $second = FOREGROUND_COLORS[$GLOBALS['numForeCols'] - 1];
+    }
+    return "\e[".$second . ';' . $first . 'm' . halfCharDown;
 }
 
 // tan($Y + $X + pi() * cos(tan($X * sin($X))))
@@ -90,37 +86,20 @@ function checkFreakoutFund1($xAdd, $yAdd, $iterations, $x = 0, $y = 0): int
     return $iterations;
 }
 
-function checkFreakout($x, $y, $remainIter, $stopAt, $xAdd, $yAdd)
-{
-    $xx = $x * $x;
-    $yy = $y * $y;
-    $xy = $x * $y;
-    $woIchGradBin = $xx + $yy;
-    while ($woIchGradBin <= $stopAt && $remainIter > 0) {
-        $x = $xx - $yy + $xAdd;
-        $y = $xy + $xy + $yAdd;
-        $xx = $x * $x;
-        $yy = $y * $y;
-        $xy = $x * $y;
-        $woIchGradBin = $xx + $yy;
-        $remainIter -= 1;
-    }
-    return $remainIter;
-}
-
 
 function render($iter = 1000, $zoom = 1, $xMod = 0, $yMod = 0) {
     $width = exec('tput cols')-1;
-    $height = exec('tput lines')-3;
+    $height = 2 *exec('tput lines');
+    $height -= 8;
     $data = [];
     $min = $max = checkFreakoutFund1(1, 1, $iter);
     $heightBy2 = $height / 2;
     $widthBy2 = $width / 2;
 
-    for ($x = 1; $x < $height; $x++) {
-        for ($y = 1; $y < $width; $y++) {
-            $normX = ( $x - $heightBy2 ) / $heightBy2; // keeps between -1 and 1
-            $normY = ( $y - $widthBy2 ) / $widthBy2; // keeps between -1 and 1
+    for ($x = 1; $x < $width; $x++) {
+        for ($y = 1; $y < $height; $y++) {
+            $normX = ( $x - $widthBy2 ) / $widthBy2; // keeps between -1 and 1
+            $normY = ( $y - $heightBy2 ) / $heightBy2; // keeps between -1 and 1
             $remain = checkFreakoutFund1(($normX * $zoom) + $xMod, ($normY * $zoom) + $yMod, $iter);
 //            $remain = checkFreakoutFund1(($normX * $zoom) + ($xMod / $zoom), ($normY * $zoom) + ($yMod / $zoom), $iter);
             if ($remain > $max) {$max = $remain;}
@@ -129,11 +108,16 @@ function render($iter = 1000, $zoom = 1, $xMod = 0, $yMod = 0) {
         }
     }
     $dispStr = "";
-    for ($x = 1; $x < $height; $x++) {
-        for ($y = 1; $y < $width; $y++) {
-            $dispStr .= getChr($data[$x][$y], $min, $max);
+    for ($y = 1; $y < $height; $y+=2) {
+        for ($x = 1; $x < $width; $x++) {
+            $secondResult = null;
+            try{$secondResult = $data[$x][$y+1];} catch (Throwable) {}
+            $dispStr .= getChr($data[$x][$y], $min, $max, $secondResult);
+            if ($y+2 > $height) {
+                break;
+            }
         }
-        $dispStr .= PHP_EOL;
+        $dispStr .= TERM_RESET.PHP_EOL;
     }
     system("clear");
     echo $dispStr;
@@ -161,16 +145,16 @@ while (1) {
             $zoom += $zoom / 10;
             break;
         case 'd':
-            $yMod += 0.1 * $zoom;
+            $xMod += 0.1 * $zoom;
             break;
         case 'a':
-            $yMod -= 0.1 * $zoom;
-            break;
-        case 'w':
             $xMod -= 0.1 * $zoom;
             break;
+        case 'w':
+            $yMod -= 0.1 * $zoom;
+            break;
         case 's':
-            $xMod += 0.1 * $zoom;
+            $yMod += 0.1 * $zoom;
             break;
         case '1':
             $iter += $iter / 10;
