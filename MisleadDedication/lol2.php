@@ -20,8 +20,8 @@ const WHITE_LIGHT="\033[0;107m";   # White
 
 $width = exec('tput cols')-1;
 $height = exec('tput lines')-1;
-$startTime = 530;
-$endTime = 560;
+$startTime = 520;
+$endTime = 700;
 $time = $startTime;
 $timeAdd = 1;
 $displayString = "";

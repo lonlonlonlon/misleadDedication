@@ -11,17 +11,20 @@ echo shell_exec('docker ps --format \'{{ .ID }}\t{{ .Names }}\'');
 echo TERM_RESET.PHP_EOL;
 
 try {
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, "https://zenquotes.io/api/today");
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    $output = json_decode(curl_exec($curl), true)[0];
-    curl_close($curl);
+    $currDate = (new DateTime())->format('Ymd');
+    if (!file_exists("/tmp/$currDate")) {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, "https://zenquotes.io/api/today");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($curl);
+        file_put_contents("/tmp/$currDate", $output);
+        curl_close($curl);
+    } else {
+        $output = file_get_contents("/tmp/$currDate");
+    }
+
+    $output = json_decode($output, true)[0];
     echo(TERM_FORE_LIGHT_GREEN.$output['q'].TERM_FORE_LIGHT_GRAY.PHP_EOL."\t".'~ '.$output['a'].TERM_RESET.PHP_EOL);
 } catch (Exception $e) {
     echo "Zitat des Tages konnte nicht abgerufen werden.";
 }
-
-echo "Ich bin Leon\n";
-echo "und ich bin Jacky\n";
-echo "Denk an die Tulpen!\n";
-echo strtotime("12.09.1997 08:00:00").PHP_EOL;
